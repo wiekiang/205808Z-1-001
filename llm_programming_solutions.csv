@@ -1,0 +1,5 @@
+Dimension,Practical programming solutions
+Strategy,"Provides recommendations for selecting suitable algorithms, libraries, frameworks, and implementation approaches. Answers often compare alternatives, discuss trade-offs, recommend best practices, and explain why one solution is more appropriate than another."
+Intervention,"Identifies where modifications should be made within the software system and recommends targeted changes. Answers commonly suggest altering configuration files, replacing components, restructuring code, or changing implementation methods to resolve issues."
+Solution,"Offers direct, actionable fixes to programming problems. Representative answers include identifying software bugs, updating library versions, correcting code, resolving dependency issues, and providing implementation examples that solve the reported problem."
+Lifecycle,"Supports developers throughout the software development lifecycle by addressing implementation, testing, debugging, optimization, deployment, maintenance, and performance considerations. Answers frequently include practical advice for improving software reliability and long-term maintainability."

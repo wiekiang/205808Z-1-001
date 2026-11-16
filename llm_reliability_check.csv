@@ -1,0 +1,1771 @@
+﻿QuestionId,QuestionTitle,QuestionBody,QuestionDate,QuestionScore,AnswerId,AnswerBody,AnswerDate,AnswerScore,Tags,DominantTopic,TopicName,TopicProbabilities,Model,TopicID,ModelsFound,ModelCount,AnswerBody_Cleaned,Keyword,Llama,Manual,Dimension,LLM-Man_Check
+311202,"Modern, high performance bloom filter in Python?","<p>I'm looking for a production quality bloom filter implementation in Python to handle fairly large numbers of items (say 100M to 1B items with 0.01% false positive rate). </p>
+
+<p><a href=""http://www.imperialviolet.org/pybloom.html"" rel=""noreferrer"">Pybloom</a> is one option but it seems to be showing its age as it throws DeprecationWarning errors  on Python 2.5 on a regular basis. Joe Gregorio also has <a href=""http://bitworking.org/news/380/bloom-filter-resources"" rel=""noreferrer"">an implementation</a>. </p>
+
+<p>Requirements are fast lookup performance and stability. I'm also open to creating Python interfaces to particularly good c/c++ implementations, or even to Jython if there's a good Java implementation.</p>
+
+<p>Lacking that, any recommendations on a bit array / bit vector representation that can handle ~16E9 bits?</p>",22/11/2008 10:53,60,311907,"<p>i recently went down this path as well; though it sounds like my application was slightly different. i was interested in approximating set operations on a large number of strings. </p>
+
+<p>you do make the key observation that a <strong>fast</strong> bit vector is required. depending on what you want to put in your bloom filter, you may also need to give some thought to the speed of the hashing algorithm(s) used. you might find this <a href=""http://www.partow.net/programming/hashfunctions/index.html"" rel=""noreferrer"">library</a> useful. you may also want to tinker with the random number technique used below that only hashes your key a single time.</p>
+
+<p>in terms of non-java bit array implementations:</p>
+
+<ul>
+<li>boost has <a href=""http://www.boost.org/doc/libs/1_37_0/libs/dynamic_bitset/dynamic_bitset.html"" rel=""noreferrer"">dynamic_bitset</a></li>
+<li>java has the built in <a href=""http://java.sun.com/javase/6/docs/api/java/util/bitset.html"" rel=""noreferrer"">bitset</a></li>
+</ul>
+
+<p>i built my bloom filter using <a href=""http://cobweb.ecn.purdue.edu/~kak/dist/"" rel=""noreferrer"">bitvector</a>. i spent some time profiling and optimizing the library and contributing back my patches to avi. go to that bitvector link and scroll down to acknowledgments in v1.5 to see details. in the end, i realized that performance was not a goal of this project and decided against using it. </p>
+
+<p>here's some code i had lying around. i may put this up on google code at python-bloom. suggestions welcome.</p>
+
+<pre><code>from bitvector import bitvector
+from random import random
+# get hashes from http://www.partow.net/programming/hashfunctions/index.html
+from hashes import rshash, jshash, pjwhash, elfhash, djbhash
+
+
+#
+# ryan.a.cox@gmail.com / www.asciiarmor.com
+#
+# copyright (c) 2008, ryan cox
+# all rights reserved 
+# bsd license: http://www.opensource.org/licenses/bsd-license.php
+#
+
+class bloomfilter(object):
+    def __init__(self, n=none, m=none, k=none, p=none, bits=none ):
+        self.m = m
+        if k &gt; 4 or k &lt; 1:
+            raise exception('must specify value of k between 1 and 4')
+        self.k = k
+        if bits:
+            self.bits = bits
+        else:
+            self.bits = bitvector( size=m )
+        self.rand = random()
+        self.hashes = []
+        self.hashes.append(rshash)
+        self.hashes.append(jshash)
+        self.hashes.append(pjwhash)
+        self.hashes.append(djbhash)
+
+        # switch between hashing techniques
+        self._indexes = self._rand_indexes
+        #self._indexes = self._hash_indexes
+
+    def __contains__(self, key):
+        for i in self._indexes(key): 
+            if not self.bits[i]:
+                return false    
+        return true 
+
+    def add(self, key):
+        dupe = true 
+        bits = []
+        for i in self._indexes(key): 
+            if dupe and not self.bits[i]:
+                dupe = false
+            self.bits[i] = 1
+            bits.append(i)
+        return dupe
+
+    def __and__(self, filter):
+        if (self.k != filter.k) or (self.m != filter.m): 
+            raise exception('must use bloom filters created with equal k / m paramters for bitwise and')
+        return bloomfilter(m=self.m,k=self.k,bits=(self.bits &amp; filter.bits))
+
+    def __or__(self, filter):
+        if (self.k != filter.k) or (self.m != filter.m): 
+            raise exception('must use bloom filters created with equal k / m paramters for bitwise or')
+        return bloomfilter(m=self.m,k=self.k,bits=(self.bits | filter.bits))
+
+    def _hash_indexes(self,key):
+        ret = []
+        for i in range(self.k):
+            ret.append(self.hashes[i](key) % self.m)
+        return ret
+
+    def _rand_indexes(self,key):
+        self.rand.seed(hash(key))
+        ret = []
+        for i in range(self.k):
+            ret.append(self.rand.randint(0,self.m-1))
+        return ret
+
+if __name__ == '__main__':
+    e = bloomfilter(m=100, k=4)
+    e.add('one')
+    e.add('two')
+    e.add('three')
+    e.add('four')
+    e.add('five')        
+
+    f = bloomfilter(m=100, k=4)
+    f.add('three')
+    f.add('four')
+    f.add('five')
+    f.add('six')
+    f.add('seven')
+    f.add('eight')
+    f.add('nine')
+    f.add(""ten"")        
+
+    # test check for dupe on add
+    assert not f.add('eleven') 
+    assert f.add('eleven') 
+
+    # test membership operations
+    assert 'ten' in f 
+    assert 'one' in e 
+    assert 'ten' not in e 
+    assert 'one' not in f         
+
+    # test set based operations
+    union = f | e
+    intersection = f &amp; e
+
+    assert 'ten' in union
+    assert 'one' in union 
+    assert 'three' in intersection
+    assert 'ten' not in intersection
+    assert 'one' not in intersection
+</code></pre>
+
+<p>also, in my case i found it useful to have a faster count_bits function for bitvector. drop this code into bitvector 1.5 and it should give you a more performant bit counting method:</p>
+
+<pre><code>def fast_count_bits( self, v ):
+    bits = (
+            0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 )
+
+    return bits[v &amp; 0xff] + bits[(v &gt;&gt; 8) &amp; 0xff] + bits[(v &gt;&gt; 16) &amp; 0xff] + bits[v &gt;&gt; 24]
+</code></pre>",22/11/2008 23:35,36,<python><jython><bloom-filter>,6,General Programming and Language Usage Questions,"[(0, np.float32(0.06025363)), (1, np.float32(0.13031475)), (4, np.float32(0.049970318)), (6, np.float32(0.5304946)), (10, np.float32(0.1324854)), (11, np.float32(0.08201083))]",BLOOM,6,['BLOOM'],1,"i recently went down this path as well though it sounds like my application was slightly different. i was interested in approximating set operations on a large number of strings. you do make the key observation that a fast bit vector is required. depending on what you want to put in your bloom filter, you may also need to give some thought to the speed of the hashing algorithm s used. you might find this library useful. you may also want to tinker with the random number technique used below that only hashes your key a single time. in terms of non-java bit array implementations: boost has dynamic bitset java has the built in bitset i built my bloom filter using bitvector . i spent some time profiling and optimizing the library and contributing back my patches to avi. go to that bitvector link and scroll down to acknowledgments in v1.5 to see details. in the end, i realized that performance was not a goal of this project and decided against using it. here's some code i had lying around. i may put this up on google code at python-bloom. suggestions welcome. also, in my case i found it useful to have a faster count bits function for bitvector. drop this code into bitvector 1.5 and it should give you a more performant bit counting method:",Filtering outputs,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+867099,Bloom filter or cuckoo hashing?,"<p>Which do you prefer and why? </p>
+
+<p>They both can be used to accomplish similar tasks but I'm curious as to see what people have used in actual applications and their reasoning for doing so.</p>
+",15/05/2009 5:32,22,867123,"<p>i prefer cuckoo hashing.
+i am wary of the false positives that may show up with bloom filters at higher fill factors.<br />
+have used cuckoo hashing in an application where we had very large hash tables and were running into memory pressure issues.
+please see my ecollections library at <a href=""http://www.codeplex.com/ecollections"" rel=""nofollow noreferrer"">http://codeplex.com/ecollections</a> for the implementation of a variant of cuckoo hashing.</p>
+
+<p>kind regards,</p>
+",15/05/2009 5:44,4,<algorithm><filter><hash><bloom-filter>,6,General Programming and Language Usage Questions,"[(0, np.float32(0.010812901)), (1, np.float32(0.17961055)), (4, np.float32(0.019565254)), (5, np.float32(0.018995432)), (6, np.float32(0.71319205)), (7, np.float32(0.013610554)), (8, np.float32(0.010894813)), (11, np.float32(0.014710871))]",BLOOM,6,['BLOOM'],1,"i prefer cuckoo hashing. i am wary of the false positives that may show up with bloom filters at higher fill factors. have used cuckoo hashing in an application where we had very large hash tables and were running into memory pressure issues. please see my ecollections library at for the implementation of a variant of cuckoo hashing. kind regards,",Filtering outputs,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+1694309,Reasons to prefer zope 3 over grok,"<p>I am familiar with zope 2 and think that zope 3 is superior in many ways, as far as I've used it (i.e. primarily with Five).</p>
+
+<p>Now I'm considering to dive deeper into zope 3. Would you recommend going even one step further and use grok instead, and if so, why? (and if not, why not? :)</p>",7/11/2009 20:31,4,1694374,"<p>a good resource is <a href=""http://plone.org/products/dexterity/documentation/manual/five.grok/referencemanual-all-pages"" rel=""noreferrer"">http://plone.org/products/dexterity/documentation/manual/five.grok/referencemanual-all-pages</a> . plone is probably the biggest piece of software that uses zope3, so the fact that plone uses grok's way of configuring zope3 counts for something.</p>
+
+<p>i'd definitively recommend going one step further and to use grok.  the underlying functionality (the so-called ""zope component architecture"") is the same, is is basically only the way it is <strong>configured</strong> that is different.</p>
+
+<p>with grok, the configuration happens in your python files instead of in xml (.zcml) files. much more comfortable, especially when you need to figure out what happens where.</p>
+
+<p>important to keep in mind: you can mix them up virtually at will.  it is ""just"" the configuration (and some defaults) that are different. so an event handler registered by using grok will react just fine to an event that is configured with pure zope3 .zcml files!</p>",7/11/2009 20:50,5,<python><zope><grok>,1,Text Analysis and Information Extraction,"[(1, np.float32(0.42748412)), (4, np.float32(0.012880835)), (5, np.float32(0.17524631)), (6, np.float32(0.3406277))]",GROK,1,['GROK'],1,"a good resource is . plone is probably the biggest piece of software that uses zope3, so the fact that plone uses grok's way of configuring zope3 counts for something. i'd definitively recommend going one step further and to use grok. the underlying functionality the so-called ""zope component architecture"" is the same, is is basically only the way it is configured that is different. with grok, the configuration happens in your python files instead of in xml .zcml files. much more comfortable, especially when you need to figure out what happens where. important to keep in mind: you can mix them up virtually at will. it is ""just"" the configuration and some defaults that are different. so an event handler registered by using grok will react just fine to an event that is configured with pure zope3 .zcml files!",Human-in-the-loop,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+1595280,A few Q's about Bloom Filter implementation,"<p>I recently discovered a site that set certain code kata.</p>
+
+<p>One of the Kata caught my eye and set me looking into Bloom filters.</p>
+
+<p>I'm using PHP and MySql.</p>
+
+<p>I have a table with roughly 45,000 words to act as a dictionary and i've written the code to create a bloom filter array.</p>
+
+<p>My questions are...</p>
+
+<ol>
+<li><p>At what point should the code run to create the Bloom filter array
+a) When the user access the page
+b) Every time a search is run
+c) Just once by me and then stored for future use
+d) something else entirely</p></li>
+<li><p>How should I store the array
+a) Keep it in an array
+b) Write to a text file
+c) Create a new table and store it there
+d) something else entirely</p></li>
+</ol>
+
+<p>Any help from someone experienced with bloom filters would be a great help.</p>
+
+<p>Cheers
+Hangfire</p>",20/10/2009 15:02,0,1972527,"<p>1) c (perhaps, in session).</p>
+
+<p>2) a (in memory).</p>
+
+<p>for only 45,000 words you could probably keep whole list in in-memory hash and still have fast lookups. bloom filter may not be needed.</p>
+
+<p>-- jorge.</p>",29/12/2009 1:52,2,<data-structures><language-agnostic><bloom-filter>,0,User Queries and API-Based Interactions,"[(0, np.float32(0.26699725)), (1, np.float32(0.06536282)), (3, np.float32(0.03437663)), (4, np.float32(0.05184319)), (5, np.float32(0.2264501)), (6, np.float32(0.09395547)), (10, np.float32(0.22790144)), (11, np.float32(0.026724324))]",BLOOM,0,['BLOOM'],1,"1 c perhaps, in session . 2 a in memory . for only 45,000 words you could probably keep whole list in in-memory hash and still have fast lookups. bloom filter may not be needed. -- jorge.",Filtering outputs,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+4282375,What is the advantage to using Bloom filters?,"<p>I am reading up on Bloom filters and they just seem silly.  Anything you can accomplish with a bloom filter, you could accomplish in less space, more efficiently, using a single hash function rather than multiple, or that's what it seems.  Why would you use a bloom filter and how is it useful?</p>
+",26/11/2010 3:37,157,4282445,"<p>from <a href=""http://en.wikipedia.org/wiki/bloom_filter"" rel=""noreferrer"">wikipedia</a>:</p>
+
+<blockquote>
+  <p>bloom filters have a strong space
+  advantage over other data structures
+  for representing sets, such as
+  self-balancing binary search trees,
+  tries, hash tables, or simple arrays
+  or linked lists of the entries. most
+  of these require storing at least the
+  data items themselves, which can
+  require anywhere from a small number
+  of bits, for small integers, to an
+  arbitrary number of bits, such as for
+  strings (tries are an exception, since
+  they can share storage between
+  elements with equal prefixes). linked
+  structures incur an additional linear
+  space overhead for pointers. a bloom
+  filter with 1% error and an optimal
+  value of k, on the other hand,
+  requires only about 9.6 bits per
+  element â€” regardless of the size of
+  the elements. this advantage comes
+  partly from its compactness, inherited
+  from arrays, and partly from its
+  probabilistic nature. if a 1% false
+  positive rate seems too high, each
+  time we add about 4.8 bits per element
+  we decrease it by ten times.</p>
+</blockquote>
+
+<p>pretty clear to me.</p>
+
+<p>a bloom filter doesn't store the elements themselves, this is the crucial point. you don't use a bloom filter to test if an element is present, you use it to test whether it's certainly <strong>not</strong> present, since it guarantees no false negatives. this lets you not do extra work for elements that don't exist in a set (such as disk io to look them up).</p>
+
+<p>and all in significantly less space than something like a hash table (which is likely going to be partially on disk for large data sets). though you may use a bloom filter <em>in conjunction</em> with a structure like a hash table, once you're certain the element has a chance of being present.</p>
+
+<p>so an example usage pattern might be:</p>
+
+<p>you've got a lot of data, on disk -- you decide on what error bound you want (e.g. 1%), that prescribes the value of <em>m</em>. then the optimal <em>k</em> is determined (from the formula given in the article). you populate your filter from this disk-bound data once.</p>
+
+<p>now you have the filter in ram. when you need to process some element, you query your filter to see if it stands a chance of existing in your data set. if it doesn't, no extra work is done. no disk reads, etc. (which you would have to do if it were a hash or tree, etc).</p>
+
+<p>otherwise, if the filter says ""yes, it's in there"", there's a 1% chance that it's wrong, so you do the necessary work to find out. 99% of the time, it really <em>will</em> be there, so the work was not for naught.</p>",26/11/2010 3:58,185,<algorithm><data-structures><bloom-filter>,6,General Programming and Language Usage Questions,"[(6, np.float32(0.47813162)), (8, np.float32(0.05592634)), (10, np.float32(0.41043606))]",BLOOM,6,['BLOOM'],1,"from wikipedia : bloom filters have a strong space advantage over other data structures for representing sets, such as self-balancing binary search trees, tries, hash tables, or simple arrays or linked lists of the entries. most of these require storing at least the data items themselves, which can require anywhere from a small number of bits, for small integers, to an arbitrary number of bits, such as for strings tries are an exception, since they can share storage between elements with equal prefixes . linked structures incur an additional linear space overhead for pointers. a bloom filter with 1% error and an optimal value of k, on the other hand, requires only about 9.6 bits per element â€” regardless of the size of the elements. this advantage comes partly from its compactness, inherited from arrays, and partly from its probabilistic nature. if a 1% false positive rate seems too high, each time we add about 4.8 bits per element we decrease it by ten times. pretty clear to me. a bloom filter doesn't store the elements themselves, this is the crucial point. you don't use a bloom filter to test if an element is present, you use it to test whether it's certainly not present, since it guarantees no false negatives. this lets you not do extra work for elements that don't exist in a set such as disk io to look them up . and all in significantly less space than something like a hash table which is likely going to be partially on disk for large data sets . though you may use a bloom filter in conjunction with a structure like a hash table, once you're certain the element has a chance of being present. so an example usage pattern might be: you've got a lot of data, on disk -- you decide on what error bound you want e.g. 1% , that prescribes the value of m . then the optimal k is determined from the formula given in the article . you populate your filter from this disk-bound data once. now you have the filter in ram. when you need to process some element, you query your filter to see if it stands a chance of existing in your data set. if it doesn't, no extra work is done. no disk reads, etc. which you would have to do if it were a hash or tree, etc . otherwise, if the filter says ""yes, it's in there"", there's a 1% chance that it's wrong, so you do the necessary work to find out. 99% of the time, it really will be there, so the work was not for naught.",Filtering outputs,Fine-tuning,Human-in-the-loop,strategy,FALSE
+4350725,"Fast Bloom Filters in C- 64bit Ints, High frequency Initialize/Query/Destroy cyle","<p>I need a bloom filter implementation, for a part of large project. The whole project is in C (and C only! no C++) and unfortunately, I have not been able to find any decent C based bloom filter implementations (except for a <a href=""http://en.literateprograms.org/Bloom_filter_(C)"" rel=""nofollow"">proof-of-concept</a> implementation ).</p>
+
+<p>My bloom filter requirements:<br>
+     1. The module containing the bloom filter runs <strong>every 50ms</strong>.<br>
+ The entire module needs to finish executing within 5-6ms,<br>
+ which means the whole bloom filter code has to be <strong>done in less than 3ms</strong>.<br>
+     2. Elements are 64 bit integers<br>
+     3. I have less than 8k elements in total (inserts/queries inclusive)<br>
+      Common case is few hundred inserts into the filter, and 1000-1500 queries.  </p>
+
+<p>Every 50ms, I receive two sets (W, R) of 64 bit ints. I need to find the intersection between W &amp; R received in this epoch (IOW, the bloom filter has to start fresh for every epoch). The code below shows the general control flow</p>
+
+<pre><code>sleep(50ms)
+...module code..
+clear(bloomfilter) /* basically a memset(0) on bloomfilter bitmap */
+W = getListW()
+for each entry in W
+  insert(bloomfilter, entry)
+R = getListR()
+for each entry in R
+   if (present(bloomfilter, entry))
+      ..do something with entry..
+..rest of module code..
+</code></pre>
+
+<p>Now, I have seen several papers that claim to do fast bloom filter operations on very large data sets. But my requirements are different. I need fast seeding (insert W) and fast query. Hash functions are another concern. I cannot afford heavy duty hash functions like SHA1 due to time constraints.</p>",3/12/2010 23:06,3,4351075,"<p>you'll want to keep this simple.  since you're dealing with a small number of elements and they are 64-bit ints (which are fast to compare on 32-bit machine, and lightning fast on a 64-bit).  as a first shot, i'd go with a hash table of 64k elements.  when you insert, do a 16-bit 'hash' the 64-bit int by xoring each of the 16-bit pieces together to get a table index.   if that isn't fast enough, profile it to find out why. </p>
+
+<p>this doesn't sound as sexy as doing something with bloom filters.  but really, you're only dealing with 8k integers.  here's some code i whipped up right now (didn't try to compile it).  it's probably pretty fast assuming random distribution of inserted numbers, and it won't work if any of the inserts is 0.</p>
+
+<pre><code>uint64_t table[65536] = {0};
+
+void clear()
+{
+    memset(table, 0, sizeof(table));
+}
+
+uint16_t hash(uint64_t val)
+{
+    assert(ele != 0);
+    uint16_t *parts = (uint16_t*)&amp;ele;
+    uint16_t h = 0x5aa5;
+    h = h * 131 + parts[0];
+    h = h * 131 + parts[1];
+    h = h * 131 + parts[2];
+    h = h * 131 + parts[3];
+    return h;
+}
+
+void insert(uint64_t ele)
+{
+    uint16_t h = hash(ele);
+    while (table[h])
+        ++h;
+    table[h] = ele;
+}
+
+int find(uint64_t ele) 
+{
+    int res = 0;
+    uint16_t h = hash(ele);
+    while (table[h] != ele)
+    {
+        if (!table[h])
+            return 0;
+        ++h;
+    }
+    return 1;
+}
+</code></pre>
+
+<p>you'll need better collision resolution if your inserts aren't randomly distributed.  you could also probably come up with a better hash method.</p>",4/12/2010 0:11,3,<c><hashtable><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.117450505)), (1, np.float32(0.05377242)), (5, np.float32(0.06281925)), (6, np.float32(0.28250188)), (7, np.float32(0.024158115)), (8, np.float32(0.029197184)), (9, np.float32(0.027262388)), (10, np.float32(0.39710015))]",BLOOM,10,['BLOOM'],1,"you'll want to keep this simple. since you're dealing with a small number of elements and they are 64-bit ints which are fast to compare on 32-bit machine, and lightning fast on a 64-bit . as a first shot, i'd go with a hash table of 64k elements. when you insert, do a 16-bit 'hash' the 64-bit int by xoring each of the 16-bit pieces together to get a table index. if that isn't fast enough, profile it to find out why. this doesn't sound as sexy as doing something with bloom filters. but really, you're only dealing with 8k integers. here's some code i whipped up right now didn't try to compile it . it's probably pretty fast assuming random distribution of inserted numbers, and it won't work if any of the inserts is 0. you'll need better collision resolution if your inserts aren't randomly distributed. you could also probably come up with a better hash method.",Filtering outputs,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+6610474,Fast way to find the row associated with a given Guid across many SQL databases and tables,"<p>I have a number of SQL databases, each with plenty of tables. These predominantly have randomly generated Guids as row primary keys. I would like a way to locate the table and row data associated with a given Guid (with no type information).</p>
+
+<p>So I was considering setting up a Bloom filter for each table and cache it somewhere. I would first test the Guid against the filter then subsequently query the database or cache for the data (or for a false positive). However I have never worked with them before and so do not know what their performance characteristics are like, and if they would be an effective solution to my problem.</p>
+
+<p><strong>Database characteristics:</strong></p>
+
+<ul>
+<li><p>~100 tables to choose between. Some are far more likely to be chosen than others.</p></li>
+<li><p>No rows are ever deleted (unless a manual cleanup after a bug) so I am not concerned about not being able to remove information from a bloom filter.</p></li>
+<li><p>More structure than data! Everything fits on one server.</p></li>
+</ul>
+
+<p>Is this a solution worth investigating? Am I better of sticking to caching more conventional lookup structures? If I go for Bloom, are there any shortcuts to the hashing functions given that Guids are a very independent input?</p>",7/07/2011 12:19,0,6614214,"<p>why use a bloom filter? you indicated that your db is light on data, so is the compactness of a bloom filter really necessary?  since false positives are possible with bloom filters, you'll need to go through the effort to perform an index lookup in one or more tables to confirm a match (so there's no real performance benefit over any other index lookup).  if you're going to maintain a bloom filter during insert operations, you could just as easily maintain a regular index in a common table.</p>
+
+<p>so why not create one or more simple tables to maintain this information? you could have a table with 2 columns (guid-value and table-id) that also forms the primary key, and use that as your index.</p>",7/07/2011 16:53,0,<sql><database><sql-server-2008><data-structures><bloom-filter>,1,Text Analysis and Information Extraction,"[(0, np.float32(0.17929873)), (1, np.float32(0.34182203)), (4, np.float32(0.06554027)), (5, np.float32(0.122910015)), (10, np.float32(0.25381488)), (11, np.float32(0.02765105))]",BLOOM,1,['BLOOM'],1,"why use a bloom filter? you indicated that your db is light on data, so is the compactness of a bloom filter really necessary? since false positives are possible with bloom filters, you'll need to go through the effort to perform an index lookup in one or more tables to confirm a match so there's no real performance benefit over any other index lookup . if you're going to maintain a bloom filter during insert operations, you could just as easily maintain a regular index in a common table. so why not create one or more simple tables to maintain this information? you could have a table with 2 columns guid-value and table-id that also forms the primary key, and use that as your index.",Filtering outputs,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+6441892,Are any implementations of Bloomier filters available?,"<p>I've come across quite a bit of theory regarding <a href=""http://en.wikipedia.org/wiki/Bloomier_filter#Bloomier_filters"" rel=""nofollow noreferrer"">Bloomier filters</a> but have had no luck digging up an actual implementation of them (no luck at github, sourceforge, google, etc.).  Does anyone know of an implementation available for use?</p>
+",22/06/2011 14:49,8,7089127,"<p>no implementation appeared to be available, so i made a first pass at one.  i have posted it on <a href=""https://github.com/egrim/java-bloomier-filter"" rel=""nofollow"">github</a> for anyone else that might find it interesting or useful.  suggestions and patches are most welcome, so feel free to get involved!</p>
+",17/08/2011 7:16,3,<data-structures><language-agnostic><bloom-filter>,6,General Programming and Language Usage Questions,"[(1, np.float32(0.0103680855)), (4, np.float32(0.2422617)), (5, np.float32(0.011688406)), (6, np.float32(0.62168306)), (10, np.float32(0.07460344))]",BLOOM,6,['BLOOM'],1,"no implementation appeared to be available, so i made a first pass at one. i have posted it on github for anyone else that might find it interesting or useful. suggestions and patches are most welcome, so feel free to get involved!",Filtering outputs,Human-in-the-loop,Human-in-the-loop,strategy,TRUE
+6558286,insert post ID with wp_insert_post,"<p>how can I choose post ID, when inserting new post, ex:</p>
+
+<pre><code>$post = array(
+'ID'                =&gt;  3333,
+'comment_status'            =&gt;  'open',
+'post_content'      =&gt;  'hi world!',
+'post_name'         =&gt;  'title_1',
+'post_status'       =&gt;  'publish',
+'post_title'        =&gt;  'sdfsfd fdsfds ds',
+'post_type'         =&gt;  'post',
+);  
+
+$post_id = wp_insert_post($post);
+</code></pre>
+
+<p>want to insert new post with id = 3333</p>",2/07/2011 16:40,11,7747510,"<p>it is possible to do this, just not with the api's insert function. you can write your own insert query instead. you always want to use the api when you can, but sometimes it's not  possible. the query would look like this:</p>
+
+<pre><code>global $wpdb;
+$wpdb-&gt;query( $wpdb-&gt;prepare(""
+    insert into {$wpdb-&gt;posts}
+    values( %d, %d, now(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s, %s, %d, %s, %d, %s, %s, %d )"",
+    $id,
+    $post_author,
+    $post_date_gmt,
+    $post_content,
+    $post_title,
+    $post_excerpt,
+    $post_status,
+    $comment_status,
+    $ping_status,
+    $post_password,
+    $post_name,
+    $to_ping,
+    $pinged,
+    $post_modified_gmt,
+    $post_content_filtered,
+    $post_parent,
+    $guid,
+    $menu_order,
+    $post_type,
+    $post_mime_type,
+    $comment_count
+) );
+</code></pre>
+
+<p>you'll have to make sure that the id doesn't already exist in the database first. if the post table schema changes in the future you may need to update the query to account for the changes.</p>
+",12/10/2011 22:52,1,<wordpress><plugins><codex>,0,User Queries and API-Based Interactions,"[(0, np.float32(0.83006924)), (1, np.float32(0.022020847)), (4, np.float32(0.025406597)), (5, np.float32(0.025260791)), (6, np.float32(0.023769705)), (7, np.float32(0.017317437)), (8, np.float32(0.013873703)), (11, np.float32(0.018590687))]",CODEX,0,['CODEX'],1,"it is possible to do this, just not with the api's insert function. you can write your own insert query instead. you always want to use the api when you can, but sometimes it's not possible. the query would look like this: you'll have to make sure that the id doesn't already exist in the database first. if the post table schema changes in the future you may need to update the query to account for the changes.",Filtering outputs,Filtering outputs,Human-in-the-loop,strategy,FALSE
+1694309,Reasons to prefer zope 3 over grok,"<p>I am familiar with zope 2 and think that zope 3 is superior in many ways, as far as I've used it (i.e. primarily with Five).</p>
+
+<p>Now I'm considering to dive deeper into zope 3. Would you recommend going even one step further and use grok instead, and if so, why? (and if not, why not? :)</p>",7/11/2009 20:31,4,1694374,"<p>a good resource is <a href=""http://plone.org/products/dexterity/documentation/manual/five.grok/referencemanual-all-pages"" rel=""noreferrer"">http://plone.org/products/dexterity/documentation/manual/five.grok/referencemanual-all-pages</a> . plone is probably the biggest piece of software that uses zope3, so the fact that plone uses grok's way of configuring zope3 counts for something.</p>
+
+<p>i'd definitively recommend going one step further and to use grok.  the underlying functionality (the so-called ""zope component architecture"") is the same, is is basically only the way it is <strong>configured</strong> that is different.</p>
+
+<p>with grok, the configuration happens in your python files instead of in xml (.zcml) files. much more comfortable, especially when you need to figure out what happens where.</p>
+
+<p>important to keep in mind: you can mix them up virtually at will.  it is ""just"" the configuration (and some defaults) that are different. so an event handler registered by using grok will react just fine to an event that is configured with pure zope3 .zcml files!</p>",7/11/2009 20:50,5,<python><zope><grok>,1,Text Analysis and Information Extraction,"[(1, np.float32(0.42748412)), (4, np.float32(0.012880835)), (5, np.float32(0.17524631)), (6, np.float32(0.3406277))]",GROK,1,['GROK'],1,"a good resource is . plone is probably the biggest piece of software that uses zope3, so the fact that plone uses grok's way of configuring zope3 counts for something. i'd definitively recommend going one step further and to use grok. the underlying functionality the so-called ""zope component architecture"" is the same, is is basically only the way it is configured that is different. with grok, the configuration happens in your python files instead of in xml .zcml files. much more comfortable, especially when you need to figure out what happens where. important to keep in mind: you can mix them up virtually at will. it is ""just"" the configuration and some defaults that are different. so an event handler registered by using grok will react just fine to an event that is configured with pure zope3 .zcml files!",System-level,System-level,System-Level,intervention,TRUE
+4350725,"Fast Bloom Filters in C- 64bit Ints, High frequency Initialize/Query/Destroy cyle","<p>I need a bloom filter implementation, for a part of large project. The whole project is in C (and C only! no C++) and unfortunately, I have not been able to find any decent C based bloom filter implementations (except for a <a href=""http://en.literateprograms.org/Bloom_filter_(C)"" rel=""nofollow"">proof-of-concept</a> implementation ).</p>
+
+<p>My bloom filter requirements:<br>
+     1. The module containing the bloom filter runs <strong>every 50ms</strong>.<br>
+ The entire module needs to finish executing within 5-6ms,<br>
+ which means the whole bloom filter code has to be <strong>done in less than 3ms</strong>.<br>
+     2. Elements are 64 bit integers<br>
+     3. I have less than 8k elements in total (inserts/queries inclusive)<br>
+      Common case is few hundred inserts into the filter, and 1000-1500 queries.  </p>
+
+<p>Every 50ms, I receive two sets (W, R) of 64 bit ints. I need to find the intersection between W &amp; R received in this epoch (IOW, the bloom filter has to start fresh for every epoch). The code below shows the general control flow</p>
+
+<pre><code>sleep(50ms)
+...module code..
+clear(bloomfilter) /* basically a memset(0) on bloomfilter bitmap */
+W = getListW()
+for each entry in W
+  insert(bloomfilter, entry)
+R = getListR()
+for each entry in R
+   if (present(bloomfilter, entry))
+      ..do something with entry..
+..rest of module code..
+</code></pre>
+
+<p>Now, I have seen several papers that claim to do fast bloom filter operations on very large data sets. But my requirements are different. I need fast seeding (insert W) and fast query. Hash functions are another concern. I cannot afford heavy duty hash functions like SHA1 due to time constraints.</p>",3/12/2010 23:06,3,4351075,"<p>you'll want to keep this simple.  since you're dealing with a small number of elements and they are 64-bit ints (which are fast to compare on 32-bit machine, and lightning fast on a 64-bit).  as a first shot, i'd go with a hash table of 64k elements.  when you insert, do a 16-bit 'hash' the 64-bit int by xoring each of the 16-bit pieces together to get a table index.   if that isn't fast enough, profile it to find out why. </p>
+
+<p>this doesn't sound as sexy as doing something with bloom filters.  but really, you're only dealing with 8k integers.  here's some code i whipped up right now (didn't try to compile it).  it's probably pretty fast assuming random distribution of inserted numbers, and it won't work if any of the inserts is 0.</p>
+
+<pre><code>uint64_t table[65536] = {0};
+
+void clear()
+{
+    memset(table, 0, sizeof(table));
+}
+
+uint16_t hash(uint64_t val)
+{
+    assert(ele != 0);
+    uint16_t *parts = (uint16_t*)&amp;ele;
+    uint16_t h = 0x5aa5;
+    h = h * 131 + parts[0];
+    h = h * 131 + parts[1];
+    h = h * 131 + parts[2];
+    h = h * 131 + parts[3];
+    return h;
+}
+
+void insert(uint64_t ele)
+{
+    uint16_t h = hash(ele);
+    while (table[h])
+        ++h;
+    table[h] = ele;
+}
+
+int find(uint64_t ele) 
+{
+    int res = 0;
+    uint16_t h = hash(ele);
+    while (table[h] != ele)
+    {
+        if (!table[h])
+            return 0;
+        ++h;
+    }
+    return 1;
+}
+</code></pre>
+
+<p>you'll need better collision resolution if your inserts aren't randomly distributed.  you could also probably come up with a better hash method.</p>",4/12/2010 0:11,3,<c><hashtable><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.117450505)), (1, np.float32(0.05377242)), (5, np.float32(0.06281925)), (6, np.float32(0.28250188)), (7, np.float32(0.024158115)), (8, np.float32(0.029197184)), (9, np.float32(0.027262388)), (10, np.float32(0.39710015))]",BLOOM,10,['BLOOM'],1,"you'll want to keep this simple. since you're dealing with a small number of elements and they are 64-bit ints which are fast to compare on 32-bit machine, and lightning fast on a 64-bit . as a first shot, i'd go with a hash table of 64k elements. when you insert, do a 16-bit 'hash' the 64-bit int by xoring each of the 16-bit pieces together to get a table index. if that isn't fast enough, profile it to find out why. this doesn't sound as sexy as doing something with bloom filters. but really, you're only dealing with 8k integers. here's some code i whipped up right now didn't try to compile it . it's probably pretty fast assuming random distribution of inserted numbers, and it won't work if any of the inserts is 0. you'll need better collision resolution if your inserts aren't randomly distributed. you could also probably come up with a better hash method.",Output-level,System-level,System-Level,intervention,TRUE
+5849283,Bloomfilter and Cassandra = Why used and why hashed several times?,"<p>I Read this:
+<a href=""http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html"" rel=""noreferrer"">http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html</a></p>
+
+<p>My Questions:</p>
+
+<p>1.) Is it correct, that Cassandra only uses the bloom filter, to find out the SST (Sorted String Table) which most likely contains the key? As there might be several SSTs and Cassandra does not know in Which SST a key might be? So to speed this up looking in all SSTs bloomfilters are used. Is this correct? (I am trying to understand how cassandra works...)</p>
+
+<p>2.) Why are (as explained in the link above) keys hashed several times? Is it correct that the keys need to be hashed with different Hash functions several times, to get a better ""random distribution of the"" Bits? If this is wrong, why does a key need to be  hashed several times? This will cost CPU cycles? If I have the output of several Hash functions, what is done with the results, are they ANDed or XORded. Does this make any difference?</p>
+
+<p>3.)Using MD5 how big is the difference of ""Fales positives by using the Bloomfilter"" compared to SHA1 (which according to the articles is random distributed)? Why is MD5 not random distributed?</p>
+
+<p>Thanks very much!!
+Jens</p>",1/05/2011 15:22,7,5849537,"<p>1) yes, see <a href=""http://wiki.apache.org/cassandra/architectureoverview"">this</a> in the cassandra wiki,  </p>
+
+<blockquote>
+  <p>cassandra uses bloom filters to save io when performing a key lookup: each sstable has a bloom filter associated with it that cassandra checks before doing any disk seeks, making queries for keys that don't exist almost free</p>
+</blockquote>
+
+<p>the <a href=""http://arin.me/blog/wtf-is-a-supercolumn-cassandra-data-model"">columns of a key</a> may be spread out in several sstables.  if it wasn't for bloom filters, every read of a key would have to read every sstable, which is prohibitively expensive.  by using bloom filters, cassandra almost always only has to look in the sstables which contain data for that key.</p>
+
+<p>2) <a href=""http://en.wikipedia.org/wiki/bloom_filter"">this</a> might give you a better understanding of bloom filters.  you hash k times to give independent positions in an array of size m.  for example, if a and b are the elements in the set, and you have k = 2, your hash functions are md5 and sha1, and m = 16, you can do</p>
+
+<pre><code>md5(a) % m = 7
+sha1(a) % m = 12
+
+md5(b)  % m = 15
+sha1(b)  % m = 12
+</code></pre>
+
+<p>this gives you m[7], m[12] and m[15] are true for the filter.</p>
+
+<p>to see if c is in the set, you do</p>
+
+<pre><code>md5(c)  % m = 8
+sha1(c) % m = 12
+</code></pre>
+
+<p>since m[8] is false, you know c is not in the set, however, for d</p>
+
+<pre><code>md5(d)  % m = 7
+sha1(d)  % m = 15
+</code></pre>
+
+<p>both m[7] and m[15] is true, but d is not in the set, so d is a false positive.</p>
+
+<p>this does cost cpu cycles, but you are trading cpu cycles for reduced io, which makes sense for cassandra.</p>
+
+<p>3) the article doesn't mention md5.  md5 is randomly distributed, and i would guess the difference between md5 and sha-1 for bloom filters is not large.</p>",1/05/2011 16:04,13,<hash><cassandra><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(1, np.float32(0.11277085)), (4, np.float32(0.10478512)), (5, np.float32(0.20469704)), (6, np.float32(0.2374236)), (10, np.float32(0.33007008))]",BLOOM,10,['BLOOM'],1,"1 yes, see cassandra uses bloom filters to save io when performing a key lookup: each sstable has a bloom filter associated with it that cassandra checks before doing any disk seeks, making queries for keys that don't exist almost free the may be spread out in several sstables. if it wasn't for bloom filters, every read of a key would have to read every sstable, which is prohibitively expensive. by using bloom filters, cassandra almost always only has to look in the sstables which contain data for that key. 2 this gives you m 7 , m 12 and m 15 are true for the filter. to see if c is in the set, you do since m 8 is false, you know c is not in the set, however, for d both m 7 and m 15 is true, but d is not in the set, so d is a false positive. this does cost cpu cycles, but you are trading cpu cycles for reduced io, which makes sense for cassandra. 3 the article doesn't mention md5. md5 is randomly distributed, and i would guess the difference between md5 and sha-1 for bloom filters is not large.",Model-level,System-level,System-Level,intervention,TRUE
+6610474,Fast way to find the row associated with a given Guid across many SQL databases and tables,"<p>I have a number of SQL databases, each with plenty of tables. These predominantly have randomly generated Guids as row primary keys. I would like a way to locate the table and row data associated with a given Guid (with no type information).</p>
+
+<p>So I was considering setting up a Bloom filter for each table and cache it somewhere. I would first test the Guid against the filter then subsequently query the database or cache for the data (or for a false positive). However I have never worked with them before and so do not know what their performance characteristics are like, and if they would be an effective solution to my problem.</p>
+
+<p><strong>Database characteristics:</strong></p>
+
+<ul>
+<li><p>~100 tables to choose between. Some are far more likely to be chosen than others.</p></li>
+<li><p>No rows are ever deleted (unless a manual cleanup after a bug) so I am not concerned about not being able to remove information from a bloom filter.</p></li>
+<li><p>More structure than data! Everything fits on one server.</p></li>
+</ul>
+
+<p>Is this a solution worth investigating? Am I better of sticking to caching more conventional lookup structures? If I go for Bloom, are there any shortcuts to the hashing functions given that Guids are a very independent input?</p>",7/07/2011 12:19,0,6614070,"<p>search your platform's help for ""information_schema"" or ""system tables"". as far as i know, every sql dbms has at least one way for you to query metadata. the ""standard"" way is to use information_schema views, but their content varies among dbms vendors.</p>
+
+<p>in <a href=""http://www.postgresql.org/docs/current/static/information-schema.html"" rel=""nofollow"">postgresql's information schema</a>, this query will show you all the table and column names that have foreign key constraints, and also their target table and column names.</p>
+
+<pre><code>select kc2.table_name as fk_table_name, kc2.column_name as fk_column_name, 
+       kc1.table_name as ref_table_name, kc1.column_name as ref_column_name
+from information_schema.referential_constraints rc
+inner join information_schema.key_column_usage kc1 
+        on rc.constraint_catalog = kc1.constraint_catalog
+       and rc.constraint_schema = kc1.constraint_schema
+       and rc.unique_constraint_name = kc1.constraint_name
+inner join information_schema.key_column_usage kc2 
+        on rc.constraint_catalog = kc1.constraint_catalog
+       and rc.constraint_schema = kc1.constraint_schema
+       and rc.constraint_name = kc2.constraint_name
+order by kc2.table_name, kc2.column_name
+</code></pre>
+
+<p><a href=""http://msdn.microsoft.com/en-us/library/ms186778.aspx"" rel=""nofollow"">sql server information schema views</a></p>",7/07/2011 16:42,0,<sql><database><sql-server-2008><data-structures><bloom-filter>,1,Text Analysis and Information Extraction,"[(0, np.float32(0.17929003)), (1, np.float32(0.34184888)), (4, np.float32(0.06554074)), (5, np.float32(0.12288861)), (10, np.float32(0.25381836)), (11, np.float32(0.027651325))]",BLOOM,1,['BLOOM'],1,"search your platform's help for ""information schema"" or ""system tables"". as far as i know, every sql dbms has at least one way for you to query metadata. the ""standard"" way is to use information schema views, but their content varies among dbms vendors. in postgresql's information schema , this query will show you all the table and column names that have foreign key constraints, and also their target table and column names. sql server information schema views",Model-level,System-level,System-Level,intervention,TRUE
+4090507,Tic-Tac-Toe: How to populate decision tree?,"<p>I'm making a Tic-Tac-Toe program. I plan to use minimax with it. I made a tree with space for all possible game sequences and I'm looking for a way to populate it. I currently have this type:</p>
+
+<pre><code>typedef struct name
+{
+    char grid [3] [3];
+    struct name * child [9];
+} node;
+</code></pre>
+
+<p>and I'm looking for a way to fill grid just like it's shown <a href=""http://en.wikipedia.org/wiki/File%3aTic-tac-toe-game-tree.svg"" rel=""nofollow"">here</a>. How would I go filling the grid to make sure that all possible combinations are there? My plan is to have the game recognize every move player can take and then decide what steps to take in order to win (I still need to figure out the decision part, but I'm holding that until I can fill the grids in tree).</p>",3/11/2010 18:47,2,8409018,"<p>here you have a working solution. it is implemented in python but i think it may help you.</p>
+
+<p>the game tree is build recursively by the <code>build_tree</code> function, and is implemented as a list of lists. </p>
+
+<p>the <code>build_tree</code> function takes a board (a node of the tree) and the piece that has the turn to play as input parameters, and builds all the possible new boards resulting of applying the piece to the board. then, for each of these new boards, it calls the <code>build_tree</code> function again, but this time changing the piece that has the turn to play. when the board is terminal (no empty squares) the recursion ends.</p>
+
+<p>this is the resulting tree for a 1x3 board:</p>
+
+<p>[(0, 0, 0), [[('x', 0, 0), [[('x', 'o', 0), [('x', 'o', 'x')]], [('x', 0, 'o'), [('x', 'x', 'o')]]]], [(0, 'x', 0), [[('o', 'x', 0), [('o', 'x', 'x')]], [(0, 'x', 'o'), [('x', 'x', 'o')]]]], [(0, 0, 'x'), [[('o', 0, 'x'), [('o', 'x', 'x')]], [(0, 'o', 'x'), [('x', 'o', 'x')]]]]]]</p>
+
+<p>empty squares are denoted by '0'.</p>
+
+<p>for the tic tac toe game, please change <code>blank_board = (0,0,0)</code> to <code>blank_board = (0,0,0,0,0,0,0,0,0)</code> in order to have a 3x3 board.</p>
+
+<pre><code>def change_piece(piece):
+    if piece == 'x': return 'o'
+    return 'x'
+
+def is_terminal(board):
+    """"""check if there are any empty square in the board""""""
+    for square in board:
+        if square == 0:
+            return false
+    return true
+
+def build_tree(node, piece):
+    """"""build the game tree recursively. 
+
+    the tree is implemented as a list of lists.
+    """"""
+    child_nodes = []
+    for index, value in enumerate(node):
+        if value == 0:
+            new_node = list(node)
+            new_node[index] = piece
+            new_node = tuple(new_node)
+            if not is_terminal(new_node):
+                child_nodes.append(build_tree(new_node,change_piece(piece)))
+            else:
+                child_nodes.append(new_node)
+    if child_nodes:
+        return [node,child_nodes]
+    return
+
+if __name__ == ""__main__"":
+    blank_board = (0,0,0)
+    game_tree = build_tree(blank_board,'x')
+    print(game_tree)
+</code></pre>",7/12/2011 0:44,1,<c><tree><minimax><tic-tac-toe>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.12672381)), (5, np.float32(0.13937193)), (6, np.float32(0.16778325)), (10, np.float32(0.5427169))]",MINIMAX,10,['MINIMAX'],1,"here you have a working solution. it is implemented in python but i think it may help you. the game tree is build recursively by the function, and is implemented as a list of lists. the function takes a board a node of the tree and the piece that has the turn to play as input parameters, and builds all the possible new boards resulting of applying the piece to the board. then, for each of these new boards, it calls the function again, but this time changing the piece that has the turn to play. when the board is terminal no empty squares the recursion ends. this is the resulting tree for a 1x3 board: 0, 0, 0 , 'x', 0, 0 , 'x', 'o', 0 , 'x', 'o', 'x' , 'x', 0, 'o' , 'x', 'x', 'o' , 0, 'x', 0 , 'o', 'x', 0 , 'o', 'x', 'x' , 0, 'x', 'o' , 'x', 'x', 'o' , 0, 0, 'x' , 'o', 0, 'x' , 'o', 'x', 'x' , 0, 'o', 'x' , 'x', 'o', 'x' empty squares are denoted by '0'. for the tic tac toe game, please change to in order to have a 3x3 board.",Input-level,System-level,System-Level,intervention,TRUE
+10159414,Why does the Synopse hyphenation code give different results from TeX's?,"<p>This question follows <a href=""https://stackoverflow.com/questions/10122297/how-to-use-this-hyphenation-library-in-delphi"">previous question</a> but different. <a href=""http://synopse.info/forum/viewtopic.php?id=74"" rel=""nofollow noreferrer"">Synopse's delphi hyphenation</a> is very fast and builts on OpenOffice <a href=""http://www.openoffice.org/lingucomponent/hyphenator.html"" rel=""nofollow noreferrer"">libhnj library that uses TeX hyphenation</a>.</p>
+
+<p>A simple test is :</p>
+
+<p>If I input 'pronunciation', the Synopse hyphenation outputs 'pro=nun=ci=ation' (4 possible hyphens or syllables). //(not 'pro=nun=ci=a=tion', 5 hyphens or syllables).</p>
+
+<p>I read 2 papers (<a href=""http://eprints.soton.ac.uk/264285/1/MarchandAdsettDamper_ISCA07.pdf"" rel=""nofollow noreferrer"">here</a> and <a href=""http://web.cs.dal.ca/~adsett/publications/AdsMar_CompSyllMeth_2009.pdf"" rel=""nofollow noreferrer"">here</a>) about Tex hyphenation algorithm uses in syllabification. Authors stated about 95% accuracy in syllabification. I tested Synopse hyphenation only for counting syllables on <a href=""http://www.speech.cs.cmu.edu/cgi-bin/cmudict"" rel=""nofollow noreferrer"">CMU Pronouncing Dictionary</a>, but only about 53% accuracy. </p>
+
+<p>Why is the result significantly different? </p>
+
+<p>I reproduce my method in a little detailed way.</p>
+
+<p>I parse the CMU pronuncing dictionary to compute all number of words.
+The CMU dic is like: </p>
+
+<pre><code>PRONOUNS  P R OW1 N AW0 N Z
+PRONOVOST  P R OW0 N OW1 V OW0 S T
+PRONTO  P R AA1 N T OW0
+PRONUNCIATION  P R OW0 N AH2 N S IY0 EY1 SH AH0 N
+PRONUNCIATION(1)  P R AH0 N AH2 N S IY0 EY1 SH AH0 N
+</code></pre>
+
+<p>I will have this result:</p>
+
+<pre><code>PRONOUNS=2
+PRONOVOST=3
+PRONTO=2
+PRONUNCIATION(1)=5 // will be ignored
+PRONUNCIATION=5   // use this one
+</code></pre>
+
+<p>Words with parentheses will be ignored when compared with the Synopse hyphenation lib. They are alternative or secondary pronunciations (variants).</p>
+
+<p>Similarly, I will use the hyphenation lib to compute the number of syllables of each word in the CMU dictionary. Then I compare the two to see how many match. The words with different numbers of syllables are recorded like below:</p>
+
+<pre><code>...
+
+94814 cmu PROMULGATED=4 | PROMULGATED=3 Synopse Hyphenation
+94821 cmu PRONGER=2 | PRONGER=1 Synopse Hyphenation
+94829 cmu PRONOUNCES=3 | PRONOUNCES=2 Synopse Hyphenation
+94833 cmu PRONTO=2 | PRONTO=1 Synopse Hyphenation
+94835 cmu PRONUNCIATION=5 | PRONUNCIATION=4 Synopse Hyphenation
+
+...
+</code></pre>
+
+<p>The total line number of CMU is 123611 (excluding lines with parentheses and lines without meaningful words, like quotation mark lines '(').
+The total different number of syllables of the <em>same</em> words for the two:  57870.</p>
+
+<p>CMU may not be the standard of syllable numbers. In this test, (123611-57870)/123611=53.183%. This is significantly different from the accuracy rate stated by the author in their paper above. Of course, they used a another database (CELEX) for their tests. Why is the result so different?</p>
+
+<p>The Synopse hyphenation library is very fast. I want to know further if this is due to the pattern file (dic file used for hyphenation originally from libhnj used in OpenOffice). Or did the author of the paper use a different dictionary file?</p>",15/04/2012 4:08,4,10176435,"<p>in short, i believe the reason that the difference in accuracy is so great between what was reported in our <em>spire 2009</em> paper and the results being reported here is because we trained the method instead of using patterns generated through prior training (which, from what i can gather, is what you are doing here).  </p>
+
+<p>how we performed training to obtain our patterns is described briefly on the third page of our paper (pg.176) and in more detail in section 4.3 of my thesis which you can find here: 
+<a href=""http://web.cs.dal.ca/~adsett/adsett_syllalgs_2008.pdf"" rel=""nofollow"">http://web.cs.dal.ca/~adsett/adsett_syllalgs_2008.pdf</a></p>",16/04/2012 14:50,1,<delphi><nlp><hyphenation>,5,Data Structures and Output Formatting,"[(1, np.float32(0.13540925)), (3, np.float32(0.058318026)), (5, np.float32(0.25491163)), (6, np.float32(0.053783234)), (7, np.float32(0.25039557)), (8, np.float32(0.022128588)), (11, np.float32(0.22101559))]",PHI,5,"['PHI', 'NLP']",2,"in short, i believe the reason that the difference in accuracy is so great between what was reported in our spire 2009 paper and the results being reported here is because we trained the method instead of using patterns generated through prior training which, from what i can gather, is what you are doing here . how we performed training to obtain our patterns is described briefly on the third page of our paper pg.176 and in more detail in section 4.3 of my thesis which you can find here:",Model-level,Output-level,Model-Level,intervention,FALSE
+10440876,How to mask ints using bitwise operators,"<p>I was wondering if there is a way to mask a list of int values using bitwise operators, and using that mask to know if a int value is one of the values that are in the mask.</p>
+
+<p>i.e. if I have the values 129 and 17, how can calculate a mask that tells me if a int value corresponds in the mask (if the int value is either 129 or 17).</p>
+
+<p>I expect my problem to be better understand with the next pseudocode.</p>
+
+<p>*<strong>*EDIT:
+I Want to pack, mask or ""compress"" an int array in only one value (mask), and then, only accept values that are in the list of values to mask (array).</strong></p>
+
+<p>Is it possible? Thanks in advance.</p>
+
+<pre><code>valuesToMask = [17, 129, ...]
+mask = getmask(valuesToMask)
+lstValues = [0,1, 10, ..., 17, 18, 19, ..., 129, ...]
+foreach(int value, in lstValues) {
+    if(check(mask,value)) 
+       printf(""\nValue %d is in the mask"", value);
+    else 
+       printf(""\nValue %d is not in the mask"", value);
+}
+</code></pre>
+
+<p>Thanks in advance. I Really appreciate your help and your time.</p>
+
+<p>(Sorry for my english)</p>",3/05/2012 23:45,2,10449226,"<p>you can <strong>partially</strong> solve your problem with <a href=""http://en.wikipedia.org/wiki/bloom_filter"" rel=""nofollow"">bloom filters</a>. the way this works is that in order to test for membership in an <code>n</code>-set of items, you define <code>k</code> hash functions to map each item to an <code>m</code>-bit key. for insertion of an element <code>a</code>, set the filter's bits at positions <code>h1(a)</code> ... <code>hk(a)</code> equal to 1. for lookup of an element <code>b</code>, if you detect a zero bit at any of the <code>h1(b)</code> ... <code>hk(b)</code>, then <code>b</code> is guaranteed not to be in the set. depending on the values for n, m and k, there is however a small probability that you get a false positive (i.e. you detect no zeros from the hash functions, but <code>b</code> was not previously stored in the filter).</p>
+
+<p>in pseudo-code:</p>
+
+<pre><code>const int m = 256;
+typedef std::bitset&lt;m&gt; mask;
+
+int listvalues[n] = { v1, ... , vn };
+typedef unsigned char (*)(int) hashfunction; // maps int to 0...255
+hashfunction hash[k] = { h1, ..., hk };
+
+mask make_mask(int x)
+{
+    mask m(0):
+    for (int i = 0; i &lt; k; ++i) { 
+        m[(hash[i])(x)] = 1; // update mask with item's hash
+    }
+    return(m);
+}    
+
+// initialize
+mask bloomfilter(0);
+for (int i = 0; i &lt; n; ++i) {        
+    bloomfilter |= make_mask(listvalues[i]);
+}
+
+// probe
+bool is_not_in_filter(const mask&amp; f, int x)
+{
+    // if a zero-bit in f matches a 1-bit in make_mask(x), then x is not in f
+    return ~f &amp; make_mask(x) != 0; 
+}
+
+// call
+int x = ...;
+bool in_set = is_not_in_filter(bloomfilter, x);
+</code></pre>
+
+<p>effectively, this expands each item to an m-bit key, and the filter is the aggregate bitwise or over all items. testing for set-membership then becomes a simple (though probabilistic) bitwise and between the negated filter with the m-bit expanded item to be tested. </p>
+
+<p><strong>update:</strong>
+the above code is pseudo-code to explain how it works. to get an actual library, see e.g. the experimental <a href=""http://svn.boost.org/svn/boost/sandbox/bloom_filter/"" rel=""nofollow"">boost.bloomfilters</a> or <a href=""http://code.google.com/p/bloom/"" rel=""nofollow"">bloom</a></p>",4/05/2012 12:55,2,<bit-manipulation><bitwise-operators><bitmask><bloom-filter>,5,Data Structures and Output Formatting,"[(5, np.float32(0.262563)), (6, np.float32(0.24438456)), (9, np.float32(0.2203325)), (10, np.float32(0.20737644)), (11, np.float32(0.046944655))]",BLOOM,5,['BLOOM'],1,"you can partially solve your problem with bloom filters . the way this works is that in order to test for membership in an -set of items, you define hash functions to map each item to an -bit key. for insertion of an element , set the filter's bits at positions ... equal to 1. for lookup of an element , if you detect a zero bit at any of the ... , then is guaranteed not to be in the set. depending on the values for n, m and k, there is however a small probability that you get a false positive i.e. you detect no zeros from the hash functions, but was not previously stored in the filter . in pseudo-code: effectively, this expands each item to an m-bit key, and the filter is the aggregate bitwise or over all items. testing for set-membership then becomes a simple though probabilistic bitwise and between the negated filter with the m-bit expanded item to be tested. update: the above code is pseudo-code to explain how it works. to get an actual library, see e.g. the experimental boost.bloomfilters or bloom",Output-level,Model-level,Model-Level,intervention,TRUE
+10972166,Bug in Minimax Algorithm for Tic Tac Toe,"<p>I am currently trying to teach myself the Minimax algorithm and I have tried to implement it in java in tic tac toe. There is a bug in my algorithm however and I can't figure out what's causing it.</p>
+
+<p>Below is the complete source code (Sorry for wall of text!):</p>
+
+<pre><code>public class TicTacToe {
+    private static boolean gameEnded = false;
+    private static boolean player = true;
+    private static Scanner in = new Scanner(System.in);
+    private static Board board = new Board();
+
+    public static void main(String[] args){
+        System.out.println(board);
+        while(!gameEnded){
+            Position position = null;
+            if(player){
+                position = makeMove();
+                board = new Board(board, position, PlayerSign.Cross);
+            }else{
+                board = findBestMove(board);
+            }               
+            player = !player;
+                System.out.println(board);
+                evaluateGame();
+        }
+    }
+
+    private static Board findBestMove(Board board) {
+        ArrayList&lt;Position&gt; positions = board.getFreePositions();
+        Board bestChild = null;
+        int previous = Integer.MIN_VALUE;
+        for(Position p : positions){
+            Board child = new Board(board, p, PlayerSign.Circle);
+            int current = max(child);
+            System.out.println(""Child Score: "" + current);
+            if(current &gt; previous){
+                bestChild = child;
+                previous = current;
+            }
+        }
+        return bestChild;
+    }
+
+    public static int max(Board board){
+        GameState gameState = board.getGameState();
+        if(gameState == GameState.CircleWin)
+            return 1;
+        else if(gameState == GameState.CrossWin)
+            return -1;
+        else if(gameState == GameState.Draw)
+            return 0;
+        ArrayList&lt;Position&gt; positions = board.getFreePositions();
+        int best = Integer.MIN_VALUE;
+        for(Position p : positions){
+            Board b = new Board(board, p, PlayerSign.Cross);
+            int move = min(b);
+            if(move &gt; best)
+                best = move;
+        }       
+        return best;
+    }
+
+    public static int min(Board board){
+        GameState gameState = board.getGameState();
+        if(gameState == GameState.CircleWin)
+            return 1;
+        else if(gameState == GameState.CrossWin)
+            return -1;
+        else if(gameState == GameState.Draw)
+            return 0;
+        ArrayList&lt;Position&gt; positions = board.getFreePositions();
+        int best = Integer.MAX_VALUE;
+        for(Position p : positions){
+            Board b = new Board(board, p, PlayerSign.Circle);
+            int move = max(b);
+            if(move &lt; best)
+                best = move;
+        }
+        return best;
+    }
+
+    public static void evaluateGame(){
+        GameState gameState = board.getGameState();
+        gameEnded = true;
+        switch(gameState){
+            case CrossWin : 
+                System.out.println(""Game Over! Cross Won!"");
+                break;
+            case CircleWin : 
+                System.out.println(""Game Over! Circle Won!"");
+                break;
+            case Draw : 
+                System.out.println(""Game Over! Game Drawn!"");
+                break;
+            default : gameEnded = false;
+                break;
+        }
+    }
+
+    public static Position makeMove(){
+        Position position = null;
+        while(true){
+            System.out.print(""Select column(x-axis). 0, 1 or 2: "");
+            int column = getColOrRow();
+            System.out.print(""Select row(y-axis). 0, 1 or 2: "");
+            int row = getColOrRow();
+            position = new Position(column, row);
+            if(board.isMarked(position))
+                System.out.println(""Position already marked!"");
+            else break;
+        }
+        return position;
+    }
+
+    private static int getColOrRow(){
+        int ret = -1;
+        while(true){
+            try{
+                ret = Integer.parseInt(in.nextLine());
+            } catch (NumberFormatException e){}
+            if(ret &lt; 0 | ret &gt; 2)
+                System.out.print(""\nIllegal input... please re-enter: "");
+            else break;
+        }
+        return ret;
+    }
+}
+
+public enum PlayerSign{
+    Cross, Circle
+}
+
+public enum GameState {
+    Incomplete, CrossWin, CircleWin, Draw
+}
+
+public final class Position {
+    public final int column;
+    public final int row;
+
+    public Position(int column, int row){
+        this.column = column;
+        this.row = row;
+    }
+}
+
+public class Board {
+    private char[][] board; //e = empty, x = cross, o = circle.
+
+    public Board(){
+        board = new char[3][3];
+        for(int y = 0; y &lt; 3; y++)
+            for(int x = 0; x &lt; 3; x++)
+                board[x][y] = 'e'; //Board initially empty
+    }
+
+    public Board(Board from, Position position, PlayerSign sign){
+        board = new char[3][3];
+        for(int y = 0; y &lt; 3; y++)
+            for(int x = 0; x &lt; 3; x++)
+                board[x][y] = from.board[x][y];
+        board[position.column][position.row] = sign==PlayerSign.Cross ? 'x':'o';
+    }
+
+    public ArrayList&lt;Position&gt; getFreePositions(){
+        ArrayList&lt;Position&gt; retArr = new ArrayList&lt;Position&gt;();     
+        for(int y = 0; y &lt; 3; y++)
+            for(int x = 0; x &lt; 3; x++)
+                if(board[x][y] == 'e')
+                    retArr.add(new Position(x, y));
+        return retArr;
+    }
+
+    public GameState getGameState(){    
+        if(hasWon('x'))
+            return GameState.CrossWin;
+        else if(hasWon('o'))
+            return GameState.CircleWin;
+        else if(getFreePositions().size() == 0)
+            return GameState.Draw;
+        else return GameState.Incomplete;
+    }
+
+    private boolean hasWon(char sign){ //8 ways to win.
+        if(board[1][1] == sign){ 
+            if(board[0][0] == sign &amp;&amp; board[2][2] == sign)
+                return true;
+            if(board[0][2] == sign &amp;&amp; board[2][0] == sign)
+                return true;
+            if(board[1][0] == sign &amp;&amp; board[1][2] == sign)
+                return true;
+            if(board[0][1] == sign &amp;&amp; board[2][1] == sign)
+                return true;
+            }
+            if(board[0][0] == sign){
+                if(board[0][1] == sign &amp;&amp; board[0][2] == sign)
+                    return true;
+                if(board[1][0] == sign &amp;&amp; board[2][0] == sign)
+                    return true;
+            }
+            if(board[2][2] == sign){
+                if(board[1][2] == sign &amp;&amp; board[0][2] == sign)
+                    return true;
+                if( board[2][1] == sign &amp;&amp; board[2][0] == sign)
+                    return true;
+            }   
+            return false;
+    }
+
+    public boolean isMarked(Position position){
+        if(board[position.column][position.row] != 'e')
+            return true;
+        return false;
+    }
+
+    public String toString(){
+        String retString = ""\n"";
+        for(int y = 0; y &lt; 3; y++){
+            for(int x = 0; x &lt; 3; x++){
+                if(board[x][y] ==  'x' || board[x][y] == 'o')
+                    retString += ""[""+board[x][y]+""]"";
+                else
+                    retString += ""[ ]"";
+            }
+            retString += ""\n"";
+        }       
+        return retString;
+    }   
+}
+</code></pre>
+
+<p>Here is the output when I run the program (Computer is circle):</p>
+
+<pre><code>[ ][ ][ ]  
+[ ][ ][ ]  
+[ ][ ][ ]  
+Select column(x-axis). 0, 1 or 2: 1  
+Select row(y-axis). 0, 1 or 2: 1  
+[ ][ ][ ]  
+[ ][x][ ]  
+[ ][ ][ ]  
+Child Score: 0  
+Child Score: 0  
+Child Score: 0  
+Child Score: 0  
+Child Score: 0  
+Child Score: 0  
+Child Score: 0  
+Child Score: 0  
+[o][ ][ ]  
+[ ][x][ ]  
+[ ][ ][ ]  
+Select column(x-axis). 0, 1 or 2: 0  
+Select row(y-axis). 0, 1 or 2: 1  
+[o][ ][ ]  
+[x][x][ ]  
+[ ][ ][ ]  
+Child Score: -1  
+Child Score: 0  
+Child Score: 0  
+Child Score: -1  
+Child Score: -1  
+Child Score: -1  
+[o][ ][o]  
+[x][x][ ]  
+[ ][ ][ ]  
+Select column(x-axis). 0, 1 or 2:   
+</code></pre>
+
+<p>As you can see after the first move, the computer thinks that no matter what move it makes it can get a draw (Score = 0).</p>
+
+<p>On the second move I put a cross on column 0, row 1. For some reason, the computer then thinks that there are two possible moves to reach a draw (Score = 0) and only four moves to lose (Score = -1). It then makes an incorrect move thinking it will get a draw.</p>
+
+<p>I first thought that there was something wrong with the hasWon method, but I have tested all 8 ways of getting three in a row and they all return true.</p>
+
+<p>I suspect that the problem exists somewhere in the findBestMove, max or min methods, but I haven't been able to figure out exactly what is causing it.</p>
+
+<p>I would really appreciate it if someone could tell what is causing the bug or give any suggestions on how to better debug my recursive algorithm.</p>",10/06/2012 20:34,6,10972386,"<p>looks to me like you mixed up parts of <code>min</code> and <code>max</code>. currently, your <code>max</code> returns the value of the worst possible move (for him) the <em>human</em> could take, instead of the optimal move the computer could take. likewise, min returns the value of the worst move the <em>computer</em> could take, instead of the optimal move for the opponent.</p>
+
+<p>fix this by switching the playersigns in <code>min</code> and <code>max</code>, and <code>findbestmove</code> should call <code>min</code>, not <code>max</code>.</p>
+",10/06/2012 21:09,7,<java><artificial-intelligence><tic-tac-toe><minimax>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.0137199145)), (1, np.float32(0.022194782)), (3, np.float32(0.011277862)), (4, np.float32(0.0185775)), (5, np.float32(0.08798942)), (6, np.float32(0.1448785)), (9, np.float32(0.013786871)), (10, np.float32(0.6815531))]",MINIMAX,10,['MINIMAX'],1,"looks to me like you mixed up parts of and . currently, your returns the value of the worst possible move for him the human could take, instead of the optimal move the computer could take. likewise, min returns the value of the worst move the computer could take, instead of the optimal move for the opponent. fix this by switching the playersigns in and , and should call , not .",Human-level,Model-level,Model-Level,intervention,TRUE
+11680074,How to map hashfunction output to bloomfilter indices?,"<p>Can anyone help me by providing an outline on how the hash function output is mapped to bloom filter indices? Here is an overview on <a href=""http://en.wikipedia.org/wiki/Bloom_filter"" rel=""noreferrer"">bloomfilters</a>.</p>
+",27/07/2012 0:49,10,11680253,"<blockquote>
+  <p>an outline on how the hash function output is mapped to a bloom filter indices</p>
+</blockquote>
+
+<p>for each of the <em>k</em> hash functions in use, they map onto a bit in the bloom filter just as hashes map onto hash buckets in a hash table.  so, very commonly you might have say a hash function generating 32 bit integers, then use the modulus <code>%</code> operator to get a bit index <code>0 &lt;&lt; i &lt; n</code> where <code>n</code> is the number of bits in your bloom filter.</p>
+
+<p>to make this very concrete, let's say a hash function generates numbers from 0 to 2^32-1, and there are 1000 bits in your bloom filter:</p>
+
+<pre><code>int bit_index = hash_function(input_value) % 1000;
+</code></pre>
+
+<p>it's important to note here that 2^32-1 is massively greater than 1000.  say the hash function instead generated pretty evenly distributed numbers but only between 0 and 1023 inclusive, then after the modulus operation it'd be twice as likely that bit_index would be in the 0..23 range as compared to 24..999 (because e.g. inputs 2 and 1002 both result in a post-modulus value of 2, but only an input of 25 produces an output of 25).  for that reason, if you have a hash function generating 32 bits, you might want to use a bloom filter sized to a number of bits that's a power of two, then slice out sections of the hash value to use as as if independent hash functions - all explained in the wikipedia article you link.  that requires a good quality hash function though, as any ""clustering"" flaws in the hash function will be passed through unmitigated to the output; having a prime number of bits is one way to mitigate such poor hashing.  still, with good hash functions, powers of two also make it easy to extract bit indices using bitwise and operations and - if needed - bit shifting, which can be faster than integer modulus, though the hash functions are probably going to dwarf that consideration in the overall performance profile.</p>
+
+<p>edit - addressing comments...</p>
+
+<p>assuming your md5 function's returning an <code>unsigned char*</code> ""p"" to <code>md5_digest_length</code> bytes of data, i suggested you try: </p>
+
+<pre><code>boost_static_assert(md5_digest_length &gt;= sizeof(int));
+int bit_index = *reinterpret_cast&lt;unsigned int*&gt;(p) % num_of_bloom_filter_bits;
+</code></pre>
+
+<p>that was actually <em>a particularly bad idea</em> - sorry - i'll explain the two reasons why in a moment.  first, to answer your question about what it does: <code>boost_static_assert()</code> is designed to give you a compile error if the expression it's passed has evaluated to <code>false</code>.  here, it's basically a way of documenting the requirement that <code>md5_digest_length</code> - which is the size in characters of the textual representation of the md5 hash - be at least as long as the number of bytes your system uses for an <code>int</code> integer type.  (that size is probably 4 bytes, but might be 8.)  that requirement is intended to ensure that the <code>reinterpret_cast</code> in the next line is safe.  what that does is read a value from the bytes at the start of the textual representation of the md5 hash as if those bytes contained an <code>int</code>.  so, say your <code>int</code> size <em>is</em> 4, md5 hash is ""0cc175b9c0f1b6a831c399e269772661"" as in your comment: the first 4 bytes contain ""0cc1"".  the ascii codes for that text are 48, 99, 99, 49 decimal.  when they're read into an <code>int</code>, depending on the endianness of the cpu the value could differ, but basically you'll get one of those numbers times 256^3 plus another one times 256^2 plus a third times 256 plus the final number.</p>
+
+<p>the reasons i said this was a particularly bad idea are:</p>
+
+<ul>
+<li>each character in the md5 string is either a digit (ascii codes 48-57) or a letter from ""a"" through ""f"" (97-102).  those 16 values are ony a 16th of the variation that a byte can have, and while the <code>int</code> value you generate occupies 32 bits you really only get 2^16 distinct values.</li>
+<li>on some computers, <code>int</code>s must be aligned at a memory address that's a multiple of 2, 4, 8 etc..  the <code>reinterpret_cast</code> - if the text happens to start at an incompatible address, could crash your computer.  note: intel &amp; amds have no such alignment requirement, though it may be faster for them to operate on properly aligned data.</li>
+</ul>
+
+<p>so, another suggestion:</p>
+
+<pre><code>// create a buffer of the right size to hold a valid unsigned long in hex representation...
+char data[sizeof(unsigned long) * 2 + 1];
+
+// copy as much of the md5 text as will fit into the buffer, nul terminating it...
+sprintf(data, ""%.*s"", sizeof data - 1, md5);
+
+// convert to an unsigned long...
+m = strtoul(data, /*endptr*/ null, /*base*/ 16);
+</code></pre>
+
+<p>here, if the md5 representation was shorter than the data buffer, just the initial part of it would be safely copied, so the boost_static_assert isn't required.</p>
+
+<p>it's much easier to use a non-cryptographic hash function, as they'll generally just return you a number rather than a readble text buffer representation of the number, so you can avoid all this nonsense.</p>",27/07/2012 1:19,9,<c++><database><algorithm><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.1417206)), (1, np.float32(0.016155386)), (4, np.float32(0.019698618)), (5, np.float32(0.24961552)), (6, np.float32(0.019673612)), (7, np.float32(0.11126668)), (8, np.float32(0.010184632)), (10, np.float32(0.4041246)), (11, np.float32(0.013603638))]",BLOOM,10,['BLOOM'],1,"an outline on how the hash function output is mapped to a bloom filter indices for each of the k hash functions in use, they map onto a bit in the bloom filter just as hashes map onto hash buckets in a hash table. so, very commonly you might have say a hash function generating 32 bit integers, then use the modulus operator to get a bit index where is the number of bits in your bloom filter. to make this very concrete, let's say a hash function generates numbers from 0 to 2^32-1, and there are 1000 bits in your bloom filter: it's important to note here that 2^32-1 is massively greater than 1000. say the hash function instead generated pretty evenly distributed numbers but only between 0 and 1023 inclusive, then after the modulus operation it'd be twice as likely that bit index would be in the 0..23 range as compared to 24..999 because e.g. inputs 2 and 1002 both result in a post-modulus value of 2, but only an input of 25 produces an output of 25 . for that reason, if you have a hash function generating 32 bits, you might want to use a bloom filter sized to a number of bits that's a power of two, then slice out sections of the hash value to use as as if independent hash functions - all explained in the wikipedia article you link. that requires a good quality hash function though, as any ""clustering"" flaws in the hash function will be passed through unmitigated to the output having a prime number of bits is one way to mitigate such poor hashing. still, with good hash functions, powers of two also make it easy to extract bit indices using bitwise and operations and - if needed - bit shifting, which can be faster than integer modulus, though the hash functions are probably going to dwarf that consideration in the overall performance profile. edit - addressing comments... assuming your md5 function's returning an ""p"" to bytes of data, i suggested you try: that was actually a particularly bad idea - sorry - i'll explain the two reasons why in a moment. first, to answer your question about what it does: is designed to give you a compile error if the expression it's passed has evaluated to . here, it's basically a way of documenting the requirement that - which is the size in characters of the textual representation of the md5 hash - be at least as long as the number of bytes your system uses for an integer type. that size is probably 4 bytes, but might be 8. that requirement is intended to ensure that the in the next line is safe. what that does is read a value from the bytes at the start of the textual representation of the md5 hash as if those bytes contained an . so, say your size is 4, md5 hash is ""0cc175b9c0f1b6a831c399e269772661"" as in your comment: the first 4 bytes contain ""0cc1"". the ascii codes for that text are 48, 99, 99, 49 decimal. when they're read into an , depending on the endianness of the cpu the value could differ, but basically you'll get one of those numbers times 256^3 plus another one times 256^2 plus a third times 256 plus the final number. the reasons i said this was a particularly bad idea are: each character in the md5 string is either a digit ascii codes 48-57 or a letter from ""a"" through ""f"" 97-102 . those 16 values are ony a 16th of the variation that a byte can have, and while the value you generate occupies 32 bits you really only get 2^16 distinct values. on some computers, s must be aligned at a memory address that's a multiple of 2, 4, 8 etc.. the - if the text happens to start at an incompatible address, could crash your computer. note: intel &amp amds have no such alignment requirement, though it may be faster for them to operate on properly aligned data. so, another suggestion: here, if the md5 representation was shorter than the data buffer, just the initial part of it would be safely copied, so the boost static assert isn't required. it's much easier to use a non-cryptographic hash function, as they'll generally just return you a number rather than a readble text buffer representation of the number, so you can avoid all this nonsense.",Input-level,Model-level,Model-Level,intervention,TRUE
+790130,Why does my Falcon script print the date a month ahead instead of today's date?,"<p>Today is April 25, 2009 which in US format is abbreviated month-day-year, so today is 04-25-09. This line</p>
+
+<pre><code>&gt; CurrentTime().toString(""%m-%d-%y"")
+</code></pre>
+
+<p>should print ""04-25-09"". Instead it prints ""05-25-09"". Why is that? According to the <a href=""http://www.falconpl.org/project_docs/core/_functions.html#CurrentTime"" rel=""nofollow noreferrer"" title=""docs"">docs</a> <code>CurrentTime()</code> returns a <code>TimeStamp</code> instance. <code>TimeStamp</code> has a <code>toString()</code> method which accepts a date/time format as a parameter, which is supposed to be in 
+<a href=""http://linux.die.net/man/3/strftime"" rel=""nofollow noreferrer"">strftime format</a>. Is there something wrong with my understanding of the code? I am using Falcon 0.8.14.2(""Vulture"") on Windows Vista (64-bit)</p>
+
+<p><a href=""http://linux.die.net/man/3/strftime"" rel=""nofollow noreferrer"">2</a>: <a href=""http://linux.die.net/man/3/strftime"" rel=""nofollow noreferrer"">http://linux.die.net/man/3/strftime</a> strftime format</p>",26/04/2009 2:22,2,791130,"<p>i also posted this question on the falcon <a href=""http://groups.google.it/group/falconpl/browse_thread/thread/21525a601a90de4d"" rel=""nofollow noreferrer"">google group</a>. apparently, this is an issue with falcon itself and is fixed in version 0.9.1. version 0.9.1 will be officially released in a week or two according to the response i received from giancarlo niccolai, the inventor of the falcon programming language.</p>",26/04/2009 16:23,4,<date><falcon>,0,User Queries and API-Based Interactions,"[(0, np.float32(0.51230747)), (1, np.float32(0.041614894)), (2, np.float32(0.061187744)), (4, np.float32(0.2573679)), (5, np.float32(0.101890445))]",FALCON,0,['FALCON'],1,"i also posted this question on the falcon google group . apparently, this is an issue with falcon itself and is fixed in version 0.9.1. version 0.9.1 will be officially released in a week or two according to the response i received from giancarlo niccolai, the inventor of the falcon programming language.",Corrective,Corrective,Corrective,solution,TRUE
+851997,What is your opinion on the Falcon language?,"<p><a href=""http://www.falconpl.org/"" rel=""nofollow noreferrer"">Falcon</a> is a programming language that supports multiple paradigms like message passing, OO, functional, and yet the code looks nice and clean.</p>
+
+<p>What do you think, does it have a chance to take off and be used as a general purpose programming glue language? Is it worth exploring? What are your impressions so far if you used it in real projects?</p>
+",12/05/2009 9:46,2,1453644,"<p>i've downloaded it. it's powerful, flexible, unicode-aware, and in use in real-world situations, namely as the scripting language for <a href=""http://www.auroraux.net/index.php/main_page"" rel=""noreferrer"">auroraux</a>.</p>
+
+<blockquote>
+  <p>falcon is our scripting language of choice. ""simple, fast and powerful programming language, easy to learn and to feel comfortable with, and a scripting engine ready to empower mission-critical multithreaded applications."" -- <a href=""http://www.auroraux.org/index.php/auroraux:about"" rel=""noreferrer"">http://www.auroraux.org/index.php/auroraux:about</a></p>
+</blockquote>
+
+<p>speaking of unicode, this is a real falcon script:</p>
+
+<pre><code>// international class; name and street
+class å›½éš›( ãªã¾ãˆ, straÃŸe )
+   // set class name and street address
+   à¤¨à¤¾à¤® = ãªã¾ãˆ
+   Ø´ÙŽØ§Ø±ÙØ¹   =  straÃŸe
+   // say who am i!
+   function è¨€ãˆ!()
+     &gt;@""i am $(self.à¤¨à¤¾à¤®) from "",self.Ø´ÙŽØ§Ø±ÙØ¹
+   end
+end
+// all the people of the world! 
+æ°‘æ— = [ å›½éš›( ""é«˜ç”°ã€€friederich"", ""å°æ¹¾"" ),
+   å›½éš›( ""smith ÏƒÏ‰ÎºÏÎ¬Ï„Î·Ï‚"", ""cantÃ¹"" ),
+   å›½éš›( ""stanisÅ‚aw lec"", ""poÅ‚udniow"" ) ]
+
+for garÃ§on in æ°‘æ—: garÃ§on.è¨€ãˆ!()
+</code></pre>
+",21/09/2009 9:37,7,<programming-languages><falcon>,6,General Programming and Language Usage Questions,"[(1, np.float32(0.0480651)), (4, np.float32(0.09465556)), (5, np.float32(0.16277087)), (6, np.float32(0.6653583))]",FALCON,6,['FALCON'],1,"i've downloaded it. it's powerful, flexible, unicode-aware, and in use in real-world situations, namely as the scripting language for auroraux . falcon is our scripting language of choice. ""simple, fast and powerful programming language, easy to learn and to feel comfortable with, and a scripting engine ready to empower mission-critical multithreaded applications."" -- speaking of unicode, this is a real falcon script:",Adaptive,Other,Other,solution,TRUE
+1500914,grok vs. django comparison,"<p>What are the smashing (pun intended) features of grok that makes it better than django? 
+how do I know when my project needs grok+zope, or it can just be developed with django ?</p>
+",30/09/2009 22:06,7,1513398,"<p>zope was the first object publishing framework evah, and the zope community has a long experience with doing things the right way. zope 2 was the first attempt, zope 3 was the next attempt, and we are now into the third generation of web frameworks, which includes grok, bfg and bobo.</p>
+
+<p>grok is massive, and has even more modules available that doesn't come when you install the base (and it's in the process of reducing the number of required modules as well, so the footprint gets smaller). bfg and bobo go the other way around, and are minimalistic frameworks but with easy access to the zope toolkit and all the functionalities of zope.</p>
+
+<p>and although django is making many of the same mistakes zope2 did, they are also fixing them much faster, so i completely expect much of this discussion to be moot in five years, because i expect every single python web framework to use wsgi+webob+repoze+deliverance+buildout as a base by then. but even then i'd go for frameworks where i can use the zope component architecture and zodb, but that includes not only the ones made by the zope community, but also for example turbogears. and maybe it will include django too by then, who knows... :-)</p>
+
+<p>depending on what the project requirements are i would today go with either plone (if they need  cms), grok or bfg (depending on the involved developers, and the complexity of the task and the budget). this is of course partly depending on my large experience with the zope technologies and my small experience with django, but mostly because i can use ztk and zodb in grok and bfg. </p>
+
+<p>ymmv, etc, blahblah.</p>
+
+<ul>
+<li><a href=""http://docs.zope.org/zopetoolkit/"" rel=""noreferrer"">zope toolkit</a></li>
+<li>brandons talk on the zope component architecture (<a href=""http://www.youtube.com/watch?v=uf77e2teeqo"" rel=""noreferrer"">video from pycon</a>, <a href=""http://www.slideshare.net/aclark/using-grok-to-walk-like-a-duck-brandon-craig-rhodes"" rel=""noreferrer"">slides from ploneconf</a>)</li>
+<li><a href=""http://bfg.repoze.org/"" rel=""noreferrer"">bfg</a></li>
+<li><a href=""http://bobo.digicool.com/"" rel=""noreferrer"">bobo</a></li>
+</ul>",3/10/2009 10:11,7,<django><zope><grok>,5,Data Structures and Output Formatting,"[(0, np.float32(0.23123921)), (1, np.float32(0.22099403)), (4, np.float32(0.019511653)), (5, np.float32(0.23865417)), (6, np.float32(0.23183136)), (7, np.float32(0.013643857)), (8, np.float32(0.010898678)), (11, np.float32(0.014602309))]",GROK,5,['GROK'],1,"zope was the first object publishing framework evah, and the zope community has a long experience with doing things the right way. zope 2 was the first attempt, zope 3 was the next attempt, and we are now into the third generation of web frameworks, which includes grok, bfg and bobo. grok is massive, and has even more modules available that doesn't come when you install the base and it's in the process of reducing the number of required modules as well, so the footprint gets smaller . bfg and bobo go the other way around, and are minimalistic frameworks but with easy access to the zope toolkit and all the functionalities of zope. and although django is making many of the same mistakes zope2 did, they are also fixing them much faster, so i completely expect much of this discussion to be moot in five years, because i expect every single python web framework to use wsgi+webob+repoze+deliverance+buildout as a base by then. but even then i'd go for frameworks where i can use the zope component architecture and zodb, but that includes not only the ones made by the zope community, but also for example turbogears. and maybe it will include django too by then, who knows... :- depending on what the project requirements are i would today go with either plone if they need cms , grok or bfg depending on the involved developers, and the complexity of the task and the budget . this is of course partly depending on my large experience with the zope technologies and my small experience with django, but mostly because i can use ztk and zodb in grok and bfg. ymmv, etc, blahblah. zope toolkit brandons talk on the zope component architecture video from pycon , slides from ploneconf bfg bobo",Corrective,Adaptive,Adaptive,solution,TRUE
+2753467,Using hash functions with Bloom filters,"<p>A bloom filter uses a hash function (or many) to generate a value between 0 and m given an input string X. My question is how to you use a hash function to generate a value in this way, for example an MD5 hash is typically represented by a 32 length <code>hex</code> string, how would I use an MD5 hashing algorithm to generate a value between 0 and m where I can specify m?  I'm using Java at the moment so an example of to do this with the MessageDigest functionality it offers would be great, though just a generic description of how to do about it would be fine too. </p>
+
+<p>Thanks</p>",2/05/2010 12:41,2,2759887,"<p>you should first convert the hash output to an unsigned integer, then reduce it modulo <em>m</em>. this looks like this:</p>
+
+<pre><code>messagedigest md = messagedigest.getinstance(""md5"");
+// hash data...
+byte[] hashvalue = md.digest();
+biginteger n = new biginteger(1, hashvalue);
+n = n.mod(m);
+// at that point, n has a value between 0 and m-1 (inclusive)
+</code></pre>
+
+<p>i have assumed that <em>m</em> is a <code>biginteger</code> instance. if necessary, use <code>biginteger.valueof()</code>. similarly, use <code>n.intvalue()</code> or <code>n.longvalue()</code> to get the value of <em>n</em> as one of the primitive types of java.</p>
+
+<p>the modular reduction is somewhat biased, but the bias is very small if <em>m</em> is substantially smaller than <em>2^128</em>.</p>",3/05/2010 17:24,4,<hash><bloom-filter>,6,General Programming and Language Usage Questions,"[(5, np.float32(0.18509902)), (6, np.float32(0.491352)), (10, np.float32(0.29278803))]",BLOOM,6,['BLOOM'],1,"you should first convert the hash output to an unsigned integer, then reduce it modulo m . this looks like this: i have assumed that m is a instance. if necessary, use . similarly, use or to get the value of n as one of the primitive types of java. the modular reduction is somewhat biased, but the bias is very small if m is substantially smaller than 2^128 .",Preventive,Corrective,Corrective,solution,TRUE
+6056049,What is it that I don't understand about the minimax algorithm,"<p>I have a question about the minimax algorithm.</p>
+
+<p>Lets say I have the following game tree, and I've added some random heuristic values to it.</p>
+
+<p><img src=""https://i.sstatic.net/dtmgc.png"" alt=""enter image description here""></p>
+
+<p>As I've understood the minimax algorithm, it will choose the green path. However, this might not be the best thing to choose in the situation. Because the right child of the top node, has the HIGHEST value that it can get, it's not the best move...</p>
+
+<p>Since if the other player does the other move, my win chance is much less... </p>
+
+<p>I'm sorry, I'm having a hard time expressing what I mean on this question. But how am I thinking wrong here?</p>
+",19/05/2011 8:49,1,6056364,"<p>the algorithm assumes both you and the 2nd player wants to win, and will always choose the best move. thus, in the question's tree - as i said in the comment, the last move (2nd player makes) is left and not right. this results in making the whole right subtree - unworthy for the first player, and the minmax algorithm will choose the following path (and not as described in the question): <code>left-&gt;left-&gt;right-&gt;left</code>
+<br><br>this is true the algorithm ""gives you less chance to win"" this is because of the fact that there is a 2nd player, who wants to win as well!
+<br><br>have a look at his <a href=""http://www.ocf.berkeley.edu/~yosenl/extras/alphabeta/alphabeta.html"" rel=""nofollow"">example</a>.
+<br>in here, the x player wants to avoid defeat so he persues the '0' in the first step. note that if (in the example) he would take first left, the 2nd player then takes left again and wins! the algorithm assures best possibility - asuuming the 2nd player acts the same as well (and assuming it knows the whole game tree)</p>",19/05/2011 9:16,1,<algorithm><minimax>,10,Game AI and Search Algorithms (Minimax),"[(1, np.float32(0.06703812)), (6, np.float32(0.16297773)), (10, np.float32(0.74044895))]",MINIMAX,10,['MINIMAX'],1,"the algorithm assumes both you and the 2nd player wants to win, and will always choose the best move. thus, in the question's tree - as i said in the comment, the last move 2nd player makes is left and not right. this results in making the whole right subtree - unworthy for the first player, and the minmax algorithm will choose the following path and not as described in the question : this is true the algorithm ""gives you less chance to win"" this is because of the fact that there is a 2nd player, who wants to win as well! have a look at his example . in here, the x player wants to avoid defeat so he persues the '0' in the first step. note that if in the example he would take first left, the 2nd player then takes left again and wins! the algorithm assures best possibility - asuuming the 2nd player acts the same as well and assuming it knows the whole game tree",Preventive,Corrective,Corrective,solution,TRUE
+6240995,Tic Tac Toe C++ algorithm debugging help,"<p>Please help me understand why this isn't working.  I don't know if there is a bug in my code, or whether my algorithm is fundamentally logically flawed. </p>
+
+<p>My algorithm is based on minimax, but I've forgone a heuristic evaluation function for a more simple technique.  Because of the simplicity of plain 3x3 tic tac toe, I just want to calculate all possible game outcomes for each potential move, and select the one with the highest 'score'.  I create a 'top level' vector of valid moves as well as a matching sized vector for their corresponding 'scores' -i.e. for every possible outcome subsequent to that move: ++ for a win and -- for a loss.</p>
+
+<p>However my vector of move scores is getting strange non-symmetrical values. Although even if the code worked, logically is it possible that a move which is calculated to lead to the most wins and least losses, would be blind to a simple tactic such as a fork?  My instincts say yes, but I haven't worked out the math in detail.  </p>
+
+<pre><code>char board [9] = { '.','.','.','.','.','.','.','.','.' };
+
+int com_turn(int turn) 
+    {
+    char player=COM; // keeps track of current player  
+
+    cout&lt;&lt;""Computer turn. \n"";  
+
+    vector&lt;int&gt; moves = get_valid_moves(board); // top level move list
+    vector&lt;int&gt; m_scores (moves.size(), 0);  // top level move scores
+
+    for (int m=0; m &lt; moves.size(); m++) // eval each top level move
+    {
+        board[moves[m]] = player; // do move
+
+        evaluate(board, turn, &amp;m_scores[m], player); 
+        cout&lt;&lt; m_scores[m] &lt;&lt;' '; // for debugging
+
+        board[moves[m]]='.'; // undo move
+    }
+
+    int bestmove;
+    for (int i=0; i &lt; moves.size(); i++) // find best score
+    {
+        bestmove = max(bestmove, m_scores[i]);
+    }
+    for (int i=0; i &lt; moves.size(); i++) // match to best move
+    {
+        if (bestmove == m_scores[i])
+        {
+            bestmove = moves[i];
+            break;
+        }
+    }
+
+    board[bestmove]=COM; // finally make com move
+    print_board();
+}
+
+vector&lt;int&gt; get_valid_moves(char *board) 
+{
+    vector&lt;int&gt; vmoves;
+    for (int i=0; i &lt; 9; i++)
+    {
+        if (board[i]=='.') vmoves.push_back(i);
+    }
+    return vmoves;
+}
+
+
+void evaluate(char *board, int turn, int *mscore, char player) 
+{
+    if (check_win(board)) 
+    {
+        (player==HUMAN)? *mscore -= 1: *mscore += 1;  
+        return;  
+    }
+    if (turn &gt; 9) return;
+
+    vector&lt;int&gt; child_moves = get_valid_moves(board);
+    if (child_moves.size() &lt; 1) return;
+
+    (player==COM)? player=HUMAN: player=COM; // switch player
+
+    for (int m=0; m &lt; child_moves.size(); m++) 
+    {
+        board[child_moves[m]] = player; // do move
+
+        evaluate(board, ++turn, mscore, player);
+
+        board[child_moves[m]]='.'; // undo move
+    }
+}
+</code></pre>",5/06/2011 4:24,1,6241049,"<p>i think you'll see where the problem is if you make evaluate return the score rather than using return-by-reference.</p>
+
+<p>evaluate should be minimaxing, but right now i think it's doing some weird sum of the leaf nodes because of the side-effect of additions and subtractions.</p>
+
+<p><strong>why summing up the scores is not correct</strong></p>
+
+<p>suppose i have the board:</p>
+
+<pre><code>. . o
+. . .
+. x x
+</code></pre>
+
+<p>then o only has <strong>one</strong> move, (block), because x's next move will win if o doesn't make it. however, there are lots of game paths that start at o making other moves, with o winning, like:</p>
+
+<pre><code>o2 o1 o
+.  .  x1
+.  x  x
+</code></pre>
+
+<p>where the number indicates which move came first.</p>
+
+<p>so you see, just getting the <strong>sum</strong> isn't going to give you the right answer.</p>
+
+<p>the reason i recommend passing the values up the tree is that that forces you to write out what the score at a node is as a function of the children. in your code right now the function is the sum, in minimax it's either min or max, depending on the player's turn.</p>",5/06/2011 4:43,2,<c++><algorithm><minimax><tic-tac-toe>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.019961882)), (1, np.float32(0.20824562)), (2, np.float32(0.023469899)), (5, np.float32(0.031697676)), (6, np.float32(0.06441269)), (10, np.float32(0.51688075)), (11, np.float32(0.11757757))]",MINIMAX,10,['MINIMAX'],1,"i think you'll see where the problem is if you make evaluate return the score rather than using return-by-reference. evaluate should be minimaxing, but right now i think it's doing some weird sum of the leaf nodes because of the side-effect of additions and subtractions. why summing up the scores is not correct suppose i have the board: then o only has one move, block , because x's next move will win if o doesn't make it. however, there are lots of game paths that start at o making other moves, with o winning, like: where the number indicates which move came first. so you see, just getting the sum isn't going to give you the right answer. the reason i recommend passing the values up the tree is that that forces you to write out what the score at a node is as a function of the children. in your code right now the function is the sum, in minimax it's either min or max, depending on the player's turn.",Corrective,Adaptive,Corrective,solution,FALSE
+6022327,Missing XLCALL32.DLL in blpConnect() call (R),"<p>I just installed RBloomberg and when I call <code>blpConnect()</code> it returns an error saying <em>""This application has failed to start because XLCall32.dll was not found. Re-installing the application may fix this problem.""</em></p>
+
+<p>So, until here, re installing has been done three times including once through <code>(install.packages(""RBloomberg"",repos=""http://r.findata.org/""))</code> and no change</p>
+
+<p>I added the dll in R's path using <code>Sys.setenv(PATH=..)</code> and still the same error. Any idea on that issue?</p>
+
+<p>Thanks</p>",16/05/2011 19:27,0,7523998,"<p>whomever stumbles here. i had the same problem. i used bloomberg excel api diagnostics to find problems and do a repair. once done, this issue went away. </p>
+",23/09/2011 3:41,1,<r><bloomberg>,4,Error Handling and Code Debugging,"[(0, np.float32(0.19530809)), (4, np.float32(0.752309))]",BLOOM,4,['BLOOM'],1,"whomever stumbles here. i had the same problem. i used bloomberg excel api diagnostics to find problems and do a repair. once done, this issue went away.",Corrective,Corrective,Corrective,solution,TRUE
+7899584,"Minimax with Alpha-beta pruning, getting the result","<p>I have followed the pseducode on the wikipedia article, and I think I got it working. However, it returns the score, and that doesn't exactly help when I want to know what move I want to make. </p>
+
+<p>I tried what I think would be a way to get the best move, but I don't think it is working as when I actually try to play against it (chess), the AI makes somewhat retarded moves with a depth level of 3. </p>
+
+<p>Here is my function: </p>
+
+<pre><code>public static function alphaBeta(node, depth, alph, beta, team, tellTheMove:Boolean = false):* {
+        var pointer:ChessMove;
+        if (depth == 0) {
+            return scoreOf(node);
+        }
+        var childrenOf:Vector.&lt;ChessMove &gt;  = returnPossibleMoves(node,team);
+        if (childrenOf.length == 0) {
+            return scoreOf(node);
+        }
+        if (team == 0) {
+            for (var i in childrenOf) {
+                var that:Number = alphaBeta(childrenOf[i],depth - 1,alph,beta,1);
+                if(tellTheMove){
+                }
+                if (that &gt; alph) {
+                    alph = that;
+                    if(tellTheMove){
+                        pointer = childrenOf[i];
+                    }
+                }
+                if (beta &lt;= alph) {
+                    break;
+                }
+            }
+            if(tellTheMove){
+                return pointer; //Returns the move that's score last exceeded alpha.
+            }
+            return alph;
+        } else {
+            for (var j in childrenOf) {
+                var that2:Number = alphaBeta(childrenOf[j],depth - 1,alph,beta,0);
+                if (that2 &lt; beta) {
+                    beta = that2;
+                }
+                if (beta &lt;= alph) {
+                    break;
+                }
+            }
+            return beta;
+        }
+    }
+</code></pre>",26/10/2011 7:01,3,7900111,"<p>depth 3 is very little for a problem like chess. at this depth most of the power depends on your final evaluation function. this evaluation function is very hard to do in way that it can predict the value of the board efficiently.</p>
+
+<p>try something simpler, which can be solved efficiently at a lower depth. tic-tac-toe is a very good game for a first attempt at min-max. this is because the final outcome is well known. if you get your algorithm correctly you should not be able to beat it at all. if you do tic-tac-toe and the algorithm is loosing, you know that you have a mistake.</p>
+
+<p>also note that in some cases min-max plays optimal, but still will look retarded to a human opponent. for example if there is no chance at winning, min-max will start to play randomly and do very dumb moves. this is the case , because min-max expects the opponent to also play perfect, which is usually not the case with humans. there are some simple changes that can be done to the algorithm to change this behavior and have min-max play ""less retarded"" in such cases.</p>",26/10/2011 8:05,4,<actionscript-3><algorithm><artificial-intelligence><chess><minimax>,10,Game AI and Search Algorithms (Minimax),"[(1, np.float32(0.11273279)), (4, np.float32(0.14432324)), (6, np.float32(0.2585036)), (10, np.float32(0.45217314))]",MINIMAX,10,['MINIMAX'],1,"depth 3 is very little for a problem like chess. at this depth most of the power depends on your final evaluation function. this evaluation function is very hard to do in way that it can predict the value of the board efficiently. try something simpler, which can be solved efficiently at a lower depth. tic-tac-toe is a very good game for a first attempt at min-max. this is because the final outcome is well known. if you get your algorithm correctly you should not be able to beat it at all. if you do tic-tac-toe and the algorithm is loosing, you know that you have a mistake. also note that in some cases min-max plays optimal, but still will look retarded to a human opponent. for example if there is no chance at winning, min-max will start to play randomly and do very dumb moves. this is the case , because min-max expects the opponent to also play perfect, which is usually not the case with humans. there are some simple changes that can be done to the algorithm to change this behavior and have min-max play ""less retarded"" in such cases.",Corrective,Corrective,Preventive,solution,FALSE
+8654718,Making grok views to look template from a parent directory in Plone,"<p>If I try</p>
+
+<pre><code>  grok.templatedir(""../browser/templates"")
+</code></pre>
+
+<p>I get </p>
+
+<pre><code>  GrokImportError: The 'templatedir' directive can not contain path separator.
+</code></pre>
+
+<p>What's the correct way to set five.grok template directory to an absolute path?</p>
+",28/12/2011 10:32,1,8660599,"<p><em>""grok.templatedir(directory) - directory - the name of the directory inside <strong>the same package</strong> as the module""</em></p>
+
+<p>i fear that at the moment there isn't a correct way, indeed there is no way.</p>
+
+<p>there is a <a href=""https://bugs.launchpad.net/grok/1.3/+bug/250977"" rel=""nofollow"">pending bug</a> about this and eventually there will be a refactoring.</p>
+
+<p>more info:</p>
+
+<ul>
+<li><a href=""http://grok.zope.org/doc/current/reference/directives.html#grok.templatedir"" rel=""nofollow"">http://grok.zope.org/doc/current/reference/directives.html#grok.templatedir</a></li>
+<li><a href=""https://bugs.launchpad.net/grok/1.3/+bug/250977"" rel=""nofollow"">https://bugs.launchpad.net/grok/1.3/+bug/250977</a></li>
+<li><a href=""https://bugs.launchpad.net/grok/+bug/562262"" rel=""nofollow"">https://bugs.launchpad.net/grok/+bug/562262</a></li>
+</ul>",28/12/2011 19:54,2,<plone><zope><grok>,11,Vector Representations and Document Similarity,"[(0, np.float32(0.16430947)), (1, np.float32(0.018903049)), (3, np.float32(0.16369306)), (4, np.float32(0.02371875)), (5, np.float32(0.23928162)), (6, np.float32(0.020179955)), (7, np.float32(0.014776152)), (8, np.float32(0.011750235)), (11, np.float32(0.3298918))]",GROK,11,['GROK'],1,"""grok.templatedir directory - directory - the name of the directory inside the same package as the module"" i fear that at the moment there isn't a correct way, indeed there is no way. there is a pending bug about this and eventually there will be a refactoring. more info:",Corrective,Corrective,Corrective,solution,TRUE
+635728,Opposite of Bloom filter?,"<p>I'm trying to optimize a piece of software which is basically running millions of tests. These tests are generated in such a way that there can be some repetitions. Of course, I don't want to spend time running tests which I already ran if I can avoid it efficiently.</p>
+
+<p>So, I'm thinking about using a Bloom filter to store the tests which have been already ran. However, the Bloom filter errs on the unsafe side for me. It gives false positives. That is, it may report that I've ran a test which I haven't. Although this could be acceptable in the scenario I'm working on, I was wondering if there's an equivalent to a Bloom filter, but erring on the opposite side, that is, only giving false negatives.</p>
+
+<p>I've skimmed through the literature without any luck.</p>
+",11/03/2009 18:18,77,1005547,<p>i'm sorry i'm not much help - i don't think its possible.  if test execution can't be ordered maybe use a packed format (8 tests per byte!) or a good sparse array library for storing the outcomes in memory.</p>,17/06/2009 7:17,0,<data-structures><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.03489252)), (1, np.float32(0.30738148)), (4, np.float32(0.16435586)), (10, np.float32(0.46943244))]",BLOOM,10,['BLOOM'],1,i'm sorry i'm not much help - i don't think its possible. if test execution can't be ordered maybe use a packed format 8 tests per byte! or a good sparse array library for storing the outcomes in memory.,Testing / evaluation,Testing or Evaluation,Testing or Evaluation,lifecycle,TRUE
+2459549,"web2py or grok (zope) on a big portal,","<p>I am planning to make some big project (1 000 000 users, approximately 500 request pre second - in hot time).
+For performance I'm going to use no relational dbms (each request could cost lot of instructions in relational dbms like mysql) - so i can't use DAL.</p>
+
+<p>My question is:</p>
+
+<ol>
+<li>how web2py is working with a big traffic, is it work concurrently? I'm consider to use web2py or Gork - Zope,</li>
+<li>How is working zodb(Z Object Database) with a lot of data? Is there some comparison with object-relational postgresql?</li>
+</ol>
+
+<p>Could you advice me please.</p>",17/03/2010 2:26,3,2460054,"<p>i agree with mikerobi - pick what will let you develop fastest. for me that is web2py.</p>
+
+<p><a href=""http://googleappengine.blogspot.com/2009/05/web2py-support-new-datastore-backend.html"" rel=""nofollow noreferrer"">web2py runs on google app engine</a>, so if you don't want to use a relational database then you can use google's datastore.  </p>",17/03/2010 5:20,4,<python><zope><web2py><zodb><grok>,6,General Programming and Language Usage Questions,"[(0, np.float32(0.3994698)), (6, np.float32(0.43389866)), (7, np.float32(0.057032388)), (8, np.float32(0.082752295))]",GROK,6,['GROK'],1,"i agree with mikerobi - pick what will let you develop fastest. for me that is web2py. web2py runs on google app engine , so if you don't want to use a relational database then you can use google's datastore.",Data preparation,Testing or Evaluation,Deployment,lifecycle,FALSE
+3630669,C++ minimax function,"<p>I have searched Google and Stackoverflow for this question, but I still don't understand how a minimax function works.</p>
+
+<p>I found the wikipedia entry has a pseudocode version of the function:</p>
+
+<pre><code>function integer minimax(node, depth)
+    if node is a terminal node or depth &lt;= 0:
+        return the heuristic value of node
+    Î± = -âˆž
+    for child in node:                       # evaluation is identical for both players 
+        Î± = max(Î±, -minimax(child, depth-1))
+    return Î±
+</code></pre>
+
+<p>Several other minimax functions I found with Google are basically the same thing; I'm trying to implement this in C++, and this is what I have come up with so far:</p>
+
+<pre><code>double miniMax(Board eval, int iterations)
+{
+    //I evaluate the board from both players' point of view and subtract the difference
+    if(iterations == 0)
+        return boardEval(eval, playerNumber) - boardEval(eval, opponentSide());
+
+    /*Here, playerTurn tells the findPossibleMoves function whose turn it is;
+    I mean, how do you generate a list of possible moves if you don't even know
+    whose turn it's supposed to be? But the problem is, I don't see where I can
+    get playerTurn from, as there are only 2 parameters in all the examples of
+    minimax I've seen*/
+    vector&lt;int&gt; moves = eval.findPossibleMoves(playerTurn);
+
+    //I'm assuming -âˆž in the wikipedia article means a very low number?
+    int result = -999999999;
+
+    //Now I run this loop to evaluate each possible move
+    /*Also, the Lua example in the wiki article has
+      alpha = node.player==1 and math.max(alpha,score) or math.min(alpha,score)
+      Is alpha a boolean there?!*/
+    for(int i = 0; i * 2 &lt; moves.size(); i++)
+    {
+        //I make a copy of the board...
+        Board temp = eval;
+
+        /*and make the next possible move... once again playerTurn crops up, and I
+        don't know where I can get that variable from*/
+        temp.putPiece(moves[i * 2], moves[i * 2 + 1], playerTurn);
+
+        /*So do I create a function max that returns the bigger of two doubles?*/
+        result = max(result, -miniMax(temp, iterations - 1));
+    }
+
+    return result;
+    /*So now I've returned the maximum score from all possible moves within a certain
+    # of moves; so how do I know which move to make? I have the score; how do I know
+    which sequence of moves that score belongs to?*/
+}
+</code></pre>
+
+<p>As you can see, I'm pretty confused about this minimax function. Please at the very least give me some hints to help me with this.</p>
+
+<p>Thanks! :)</p>",2/09/2010 19:49,2,3630953,"<p>a good place to start with game tree searching is the <a href=""https://chessprogramming.wikispaces.com/minimax"" rel=""nofollow noreferrer"">chess programming wiki</a>. for your question about the move: i think it is most common to have two max-functions. the difference between the two max functions is that one returns only the score and the other returns the score and the best move. a recursive call order would be like following:</p>
+
+<pre><code>maxwithbestmovereturn(...) --&gt; min(...) --&gt; max(...) --&gt; min(...)
+</code></pre>
+
+<p>there are some good papers with pseudocode for the alpha beta algorithm:</p>
+
+<ul>
+<li><a href=""http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.24.5504&amp;rep=rep1&amp;type=pdf"" rel=""nofollow noreferrer"">ta marsland - computer chess and search</a></li>
+<li><a href=""http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=27e8dd8d24a51d67bae6f859274929c9?doi=10.1.1.33.6855&amp;rep=rep1&amp;type=pdf"" rel=""nofollow noreferrer"">j schaeffer - the games computers (and people) play</a></li>
+</ul>
+
+<p>to your question in the comment: <em>and math.max(alpha,score) or math.min(alpha,score) is alpha a boolean there?!</em></p>
+
+<p>no alpha is a window bound in a alpha beta algorithm. the alpha value gets updated with a new value. because alpha and beta are swapped with the recursive call of the negamax-function the alpha variable refers to the beta variable in the next recursive call.</p>
+
+<p>one note to the playerturn variable: the minimax or alpha-beta algorithm doesn't need this information. so i would give the information -- who's next --, into the board-structure. the functions findpossiblemoves and boardeval get all information they need from the board-structure.</p>
+
+<p>one note to the recursive break condition: if i understand your code right, then you only have the one with <code>iterations == o</code>. i think this means the algorithm has reached the desired depth. but what if there are no possible moves left befor the algorithm reaches this depth. maybe you should write following:</p>
+
+<pre><code>vector&lt;int&gt; moves = findpossiblemoves(...);
+if (!moves.size())
+    return boardeval(...);
+</code></pre>",2/09/2010 20:26,1,<c++><algorithm><minimax>,6,General Programming and Language Usage Questions,"[(4, np.float32(0.18509248)), (6, np.float32(0.4236184)), (10, np.float32(0.3539039))]",MINIMAX,6,['MINIMAX'],1,"a good place to start with game tree searching is the chess programming wiki . for your question about the move: i think it is most common to have two max-functions. the difference between the two max functions is that one returns only the score and the other returns the score and the best move. a recursive call order would be like following: there are some good papers with pseudocode for the alpha beta algorithm: ta marsland - computer chess and search j schaeffer - the games computers and people play to your question in the comment: and math.max alpha,score or math.min alpha,score is alpha a boolean there?! no alpha is a window bound in a alpha beta algorithm. the alpha value gets updated with a new value. because alpha and beta are swapped with the recursive call of the negamax-function the alpha variable refers to the beta variable in the next recursive call. one note to the playerturn variable: the minimax or alpha-beta algorithm doesn't need this information. so i would give the information -- who's next --, into the board-structure. the functions findpossiblemoves and boardeval get all information they need from the board-structure. one note to the recursive break condition: if i understand your code right, then you only have the one with . i think this means the algorithm has reached the desired depth. but what if there are no possible moves left befor the algorithm reaches this depth. maybe you should write following:",Maintenance,Model training,Model training,lifecycle,TRUE
+3956258,Minimax explained for an idiot,"<p>I've wasted my entire day trying to use the minimax algorithm to make an unbeatable tictactoe AI. I missed something along the way (brain fried).</p>
+<p>I'm not looking for code here, just a better explanation of where I went wrong.</p>
+<h3>Here is my current code (the minimax method always returns 0 for some reason):</h3>
+<pre><code>from copy import deepcopy
+
+
+class Square(object):
+    def __init__(self, player=None):
+        self.player = player
+    
+    @property
+    def empty(self):
+        return self.player is None
+
+
+class Board(object):
+    winning_combos = (
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6],
+    )
+    
+    def __init__(self, squares={}):
+        self.squares = squares
+        for i in range(9):
+            if self.squares.get(i) is None:
+                self.squares[i] = Square()
+    
+    @property
+    def available_moves(self):
+        return [k for k, v in self.squares.iteritems() if v.empty]
+    
+    @property
+    def complete(self):
+        for combo in self.winning_combos:
+            combo_available = True
+            for pos in combo:
+                if not pos in self.available_moves:
+                    combo_available = False
+            if combo_available:
+                return self.winner is not None
+        return True
+    
+    @property
+    def player_won(self):
+        return self.winner == 'X'
+    
+    @property
+    def computer_won(self):
+        return self.winner == 'O'
+    
+    @property
+    def tied(self):
+        return self.complete == True and self.winner is None
+    
+    @property
+    def winner(self):
+        for player in ('X', 'O'):
+            positions = self.get_squares(player)
+            for combo in self.winning_combos:
+                win = True
+                for pos in combo:
+                    if pos not in positions:
+                        win = False
+                if win:
+                    return player
+        return None
+    
+    @property
+    def heuristic(self):
+        if self.player_won:
+            return -1
+        elif self.tied:
+            return 0
+        elif self.computer_won:
+            return 1
+    
+    def get_squares(self, player):
+        return [k for k,v in self.squares.iteritems() if v.player == player]
+    
+    def make_move(self, position, player):
+        self.squares[position] = Square(player)
+    
+    def minimax(self, node, player):
+        if node.complete:
+            return node.heuristic
+        a = -1e10000
+        for move in node.available_moves:
+            child = deepcopy(node)
+            child.make_move(move, player)
+            a = max([a, -self.minimax(child, get_enemy(player))])
+        return a
+
+
+def get_enemy(player):
+    if player == 'X':
+        return 'O'
+    return 'X'
+</code></pre>",18/10/2010 2:26,16,3956356,"<p><strong>step 1: build your game tree</strong></p>
+
+<p>starting from the current board generate all possible moves your opponent can make.
+then for each of those generate all the possible moves you can make.
+for tic-tac-toe simply continue until no one can play.  in other games you'll generally stop after a given time or depth.</p>
+
+<p>this looks like a tree, draw it yourself on a piece of paper, current board at top, all opponent moves one layer below, all your possible moves in response one layer below etc.</p>
+
+<p><strong>step 2: score all boards at the bottom of the tree</strong></p>
+
+<p>for a simple game like tic-tac-toe make the score 0 if you lose, 50 tie, 100 win.</p>
+
+<p><strong>step 3: propagate the score up the tree</strong></p>
+
+<p>this is where the min-max come into play.  the score of a previously unscored board depends on its children and who gets to play. assume both you and your opponent always choose the best possible move at the given state.  the best move for the opponent is the move that gives <strong>you</strong> the worst score. likewise, your best move is the move that gives you the highest score. in case of the opponent's turn, you choose the child with the minimum score (that maximizes his benefit). if it is your turn you assume you'll make the best possible move, so you choose the maximum.</p>
+
+<p><strong>step 4: pick your best move</strong></p>
+
+<p>now play the move that results in the best propagated score among all your possible plays from the current position.</p>
+
+<p>try it on a piece of paper, if starting from a blank board is too much for you start from some advanced tic-tac-toe position.</p>
+
+<p><strong>using recursion:</strong>
+very often this can be simplified by using recursion.  the ""scoring"" function is called recursively at each depth and depending on whether or not the depth is odd or even it select max or min respectively for all possible moves.  when no moves are possible it evaluates the static score of the board.  recursive solutions (e.g. the example code) can be a bit trickier to grasp.</p>",18/10/2010 3:01,20,<python><minimax><tic-tac-toe>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.07509634)), (4, np.float32(0.10490314)), (6, np.float32(0.26385456)), (10, np.float32(0.5148396))]",MINIMAX,10,['MINIMAX'],1,"step 1: build your game tree starting from the current board generate all possible moves your opponent can make. then for each of those generate all the possible moves you can make. for tic-tac-toe simply continue until no one can play. in other games you'll generally stop after a given time or depth. this looks like a tree, draw it yourself on a piece of paper, current board at top, all opponent moves one layer below, all your possible moves in response one layer below etc. step 2: score all boards at the bottom of the tree for a simple game like tic-tac-toe make the score 0 if you lose, 50 tie, 100 win. step 3: propagate the score up the tree this is where the min-max come into play. the score of a previously unscored board depends on its children and who gets to play. assume both you and your opponent always choose the best possible move at the given state. the best move for the opponent is the move that gives you the worst score. likewise, your best move is the move that gives you the highest score. in case of the opponent's turn, you choose the child with the minimum score that maximizes his benefit . if it is your turn you assume you'll make the best possible move, so you choose the maximum. step 4: pick your best move now play the move that results in the best propagated score among all your possible plays from the current position. try it on a piece of paper, if starting from a blank board is too much for you start from some advanced tic-tac-toe position. using recursion: very often this can be simplified by using recursion. the ""scoring"" function is called recursively at each depth and depending on whether or not the depth is odd or even it select max or min respectively for all possible moves. when no moves are possible it evaluates the static score of the board. recursive solutions e.g. the example code can be a bit trickier to grasp.",Testing / evaluation,Testing or Evaluation,Model training,lifecycle,FALSE
+5849283,Bloomfilter and Cassandra = Why used and why hashed several times?,"<p>I Read this:
+<a href=""http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html"" rel=""noreferrer"">http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html</a></p>
+
+<p>My Questions:</p>
+
+<p>1.) Is it correct, that Cassandra only uses the bloom filter, to find out the SST (Sorted String Table) which most likely contains the key? As there might be several SSTs and Cassandra does not know in Which SST a key might be? So to speed this up looking in all SSTs bloomfilters are used. Is this correct? (I am trying to understand how cassandra works...)</p>
+
+<p>2.) Why are (as explained in the link above) keys hashed several times? Is it correct that the keys need to be hashed with different Hash functions several times, to get a better ""random distribution of the"" Bits? If this is wrong, why does a key need to be  hashed several times? This will cost CPU cycles? If I have the output of several Hash functions, what is done with the results, are they ANDed or XORded. Does this make any difference?</p>
+
+<p>3.)Using MD5 how big is the difference of ""Fales positives by using the Bloomfilter"" compared to SHA1 (which according to the articles is random distributed)? Why is MD5 not random distributed?</p>
+
+<p>Thanks very much!!
+Jens</p>",1/05/2011 15:22,7,5849537,"<p>1) yes, see <a href=""http://wiki.apache.org/cassandra/architectureoverview"">this</a> in the cassandra wiki,  </p>
+
+<blockquote>
+  <p>cassandra uses bloom filters to save io when performing a key lookup: each sstable has a bloom filter associated with it that cassandra checks before doing any disk seeks, making queries for keys that don't exist almost free</p>
+</blockquote>
+
+<p>the <a href=""http://arin.me/blog/wtf-is-a-supercolumn-cassandra-data-model"">columns of a key</a> may be spread out in several sstables.  if it wasn't for bloom filters, every read of a key would have to read every sstable, which is prohibitively expensive.  by using bloom filters, cassandra almost always only has to look in the sstables which contain data for that key.</p>
+
+<p>2) <a href=""http://en.wikipedia.org/wiki/bloom_filter"">this</a> might give you a better understanding of bloom filters.  you hash k times to give independent positions in an array of size m.  for example, if a and b are the elements in the set, and you have k = 2, your hash functions are md5 and sha1, and m = 16, you can do</p>
+
+<pre><code>md5(a) % m = 7
+sha1(a) % m = 12
+
+md5(b)  % m = 15
+sha1(b)  % m = 12
+</code></pre>
+
+<p>this gives you m[7], m[12] and m[15] are true for the filter.</p>
+
+<p>to see if c is in the set, you do</p>
+
+<pre><code>md5(c)  % m = 8
+sha1(c) % m = 12
+</code></pre>
+
+<p>since m[8] is false, you know c is not in the set, however, for d</p>
+
+<pre><code>md5(d)  % m = 7
+sha1(d)  % m = 15
+</code></pre>
+
+<p>both m[7] and m[15] is true, but d is not in the set, so d is a false positive.</p>
+
+<p>this does cost cpu cycles, but you are trading cpu cycles for reduced io, which makes sense for cassandra.</p>
+
+<p>3) the article doesn't mention md5.  md5 is randomly distributed, and i would guess the difference between md5 and sha-1 for bloom filters is not large.</p>",1/05/2011 16:04,13,<hash><cassandra><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(1, np.float32(0.11277085)), (4, np.float32(0.10478512)), (5, np.float32(0.20469704)), (6, np.float32(0.2374236)), (10, np.float32(0.33007008))]",BLOOM,10,['BLOOM'],1,"1 yes, see cassandra uses bloom filters to save io when performing a key lookup: each sstable has a bloom filter associated with it that cassandra checks before doing any disk seeks, making queries for keys that don't exist almost free the may be spread out in several sstables. if it wasn't for bloom filters, every read of a key would have to read every sstable, which is prohibitively expensive. by using bloom filters, cassandra almost always only has to look in the sstables which contain data for that key. 2 this gives you m 7 , m 12 and m 15 are true for the filter. to see if c is in the set, you do since m 8 is false, you know c is not in the set, however, for d both m 7 and m 15 is true, but d is not in the set, so d is a false positive. this does cost cpu cycles, but you are trading cpu cycles for reduced io, which makes sense for cassandra. 3 the article doesn't mention md5. md5 is randomly distributed, and i would guess the difference between md5 and sha-1 for bloom filters is not large.",Data preparation,Model training,Model training,lifecycle,TRUE
+6656149,Are overlapping sub-arrays of a byte array independent enough to use as hash function(s) for Bloom Filter?,"<p>I have the following question in the context of a BloomFilter.  BloomFilters need to have <code>k</code> independent hash functions.  Let's call these function <code>h1, h2, ... hk</code>.  Independent in this context means that their value will have very little correlation (hopefully zero) when applied to the same set.  See the Algorithm Description at <a href=""http://en.wikipedia.org/wiki/Bloom_filter"" rel=""nofollow"">http://en.wikipedia.org/wiki/Bloom_filter</a> (but of course, you already know that page inside out :).</p>
+
+<p>Now, assume that I want to define my hash functions using some <code>n</code> bits (coming from a crypto function if you must know, but it's not relevant for the question), which are independent from each other themselves.  If you want more context you can read <a href=""http://bitworking.org/news/380/bloom-filter-resources"" rel=""nofollow"">http://bitworking.org/news/380/bloom-filter-resources</a> which is doing something similar.</p>
+
+<p>For example, assume I want to define each <code>h</code> as (pardon my pseudo-code):</p>
+
+<pre><code>bytes = MD5(value)
+h1 = bytes[0-3] as Integer
+h2 = bytes[4-7] as Integer
+h3 = bytes[8-11] as Integer
+...
+</code></pre>
+
+<p>Of course we will run out of hash functions very quickly.  We only get four in this MD5 example.</p>
+
+<p>One possibility is to let the hash functions overlap with each other and not have the requirement that the four bytes are sequential.  That way we has many hash functions as permutations the byte array allows.  To keep it simple, what if we defined the hash functions in the following way:</p>
+
+<pre><code>bytes = MD5(value)
+h1 = bytes[0-3] as Integer
+h2 = bytes[1-4] as Integer
+h3 = bytes[2-5] as Integer
+...
+</code></pre>
+
+<p>It is easy to see that in the MD5 case now we have 12 hashing functions instead of four.</p>
+
+<p>Finally, we get to <strong>THE</strong> question.  Are these hashing functions independent?  Thanks!</p>
+
+<p><strong>UPDATE</strong>: I decided to try to answer the question from a practical point of view so I created a small program that would test the hypothesis.  See below.</p>",11/07/2011 20:30,1,6754365,"<p>running the program below will test the hypothesis with random number generators.</p>
+
+<pre><code>public static void main(string[] args) {
+    int r = 100, n = 10000, w = 8;
+    double[] totals = new double[33];
+    random r = new random();
+
+    for (int k = 0; k &lt; r; k++) {
+        // generate 10,000 random byte arrays
+        byte[][] bytes = new byte[n][w];
+        for (int i = 0; i &lt; n; i++) r.nextbytes(bytes[i]);
+
+        double[] a1 = new double[n], a2 = new double[n];
+        for (int i = 0; i &lt;= 32; i++) {
+
+            // extract arrays
+            for (int j = 0; j &lt; n; j++) {
+                a1[j] = readint(bytes[j], 0, 31);
+                a2[j] = readint(bytes[j], 32 - i, 31);
+            }
+
+            double c = (new pearsonscorrelation()).correlation(a1, a2);
+            totals[i] += c;
+        }
+    }
+}
+</code></pre>
+
+<p>the interesting bits is that only when there is only one overlapping bit, the correlation starts to be significant.  below are the pearson correlation coefficients for each number of overlapping bits.  we start very low (meaning close to the <code>0</code> overlapping case), and get <code>1</code> when they fully overlap.</p>
+
+<pre><code>0   -0.001883705757299319
+1   -0.0019261826793995395
+2   -0.0018466135577488883
+3   -0.001499114477250019
+4   -0.0010874727770462341
+5   -1.1219111699336884e-5
+6   -0.001760700583842139
+7   3.6545455908216937e-4
+8   0.0014823972050436482
+9   0.0014809963180788554
+10  0.0015226692114697182
+11  0.00199027499920776
+12  0.001720451344380218
+13  -2.0219121772336676e-4
+14  6.880004078769847e-4
+15  8.605949344202965e-4
+16  -0.0025640320027890645
+17  -0.002552269654230886
+18  -0.002550425130285998
+19  -0.002522446787072504
+20  -0.00320337678141518
+21  -7.554573868921899e-4
+22  -6.463448718890875e-4
+23  -3.4709181348336335e-4
+24  0.0038077518094915912
+25  0.0037865326140343815
+26  0.0038728464390708982
+27  0.0035091958914765407
+28  0.005099109955591643
+29  0.016993434043779915
+30  0.06120260114179265
+31  0.25159073855202346
+32  1.0
+</code></pre>
+
+<p><strong>bottom line</strong>: it seems that a shift of one byte (meaning the 24 value above) should be quite safe with respect to hash function generation.</p>",19/07/2011 21:24,0,<statistics><correlation><bloom-filter>,10,Game AI and Search Algorithms (Minimax),"[(0, np.float32(0.1071485)), (1, np.float32(0.08878684)), (4, np.float32(0.05556879)), (5, np.float32(0.08505385)), (6, np.float32(0.14785232)), (8, np.float32(0.04468774)), (10, np.float32(0.37863365)), (11, np.float32(0.089220665))]",BLOOM,10,['BLOOM'],1,"running the program below will test the hypothesis with random number generators. the interesting bits is that only when there is only one overlapping bit, the correlation starts to be significant. below are the pearson correlation coefficients for each number of overlapping bits. we start very low meaning close to the overlapping case , and get when they fully overlap. bottom line : it seems that a shift of one byte meaning the 24 value above should be quite safe with respect to hash function generation.",Testing / evaluation,Testing or Evaluation,Testing or Evaluation,lifecycle,TRUE
+6952607,What would be a good AI strategy to play Gomoku?,"<p>I'm writing a game that's a variant of <a href=""http://en.wikipedia.org/wiki/Gomoku"" rel=""nofollow noreferrer"">Gomoku</a>. Basically a tic tac toe on a huge board.</p>
+<p>Wondering if anyone knows a good AI strategy for the game. My current implementation is very stupid and takes a long time (O(n^3), approx 1-2 second to make a move):</p>
+<pre><code>-(void) moveAI {
+    //check if the enemy is trying to make a line horizontally, vertically, or diagonally
+    //O(n^3 * 3)
+    [self checkEnemies];
+
+    //check if we can make a line horizontally, vertically, or diagonally
+    //O(n^3 * 3)
+    [self checkIfWeCanMakeALine];
+
+    //otherwise just put the piece randomly
+    [self put randomly];
+}
+</code></pre>",5/08/2011 6:59,16,6953630,"<p>i created a gomoku player once and it was quite succesful using alpha-beta pruning and giving each position a score dependent on how many half-open and fully open 2s, 3s and 4s each player had.</p>
+
+<p>calculating this is not n^3. you just check if the latest move closes any of your opponents lines and if it extends some of your lines, then modify the score accordingly.</p>
+
+<p>if you need it to play even better, i would look into some techniques from chess computers. for example, trying ""killer moves"" (remembering which moves gave a high score or won outright in other positions) first when you search will significantly improve the efficiency of your tree search. it is important to try the assumed best moves first in alpha-beta pruning.</p>
+
+<p>when you have your player, you should try to find out which scoring of the different elements (2s, 3s, 4s, open and half-open, etc) is best, by playing different versions against each other.</p>",5/08/2011 8:43,5,<artificial-intelligence><minimax><gomoku>,10,Game AI and Search Algorithms (Minimax),"[(6, np.float32(0.31847173)), (10, np.float32(0.6215081))]",MINIMAX,10,['MINIMAX'],1,"i created a gomoku player once and it was quite succesful using alpha-beta pruning and giving each position a score dependent on how many half-open and fully open 2s, 3s and 4s each player had. calculating this is not n^3. you just check if the latest move closes any of your opponents lines and if it extends some of your lines, then modify the score accordingly. if you need it to play even better, i would look into some techniques from chess computers. for example, trying ""killer moves"" remembering which moves gave a high score or won outright in other positions first when you search will significantly improve the efficiency of your tree search. it is important to try the assumed best moves first in alpha-beta pruning. when you have your player, you should try to find out which scoring of the different elements 2s, 3s, 4s, open and half-open, etc is best, by playing different versions against each other.",Testing / evaluation,Testing or Evaluation,Testing or Evaluation,lifecycle,TRUE
+5783266,Live price updates in R-Bloomberg price subcriptions,"<p>I am using the RBloomberg library for live and historical price data, but I would like to know if it is possible for a variable to update its live pricing continuously. Right now:</p>
+
+<pre><code>&gt; library(RBloomberg)
+Loading required package: rJava
+&gt; conn &lt;- blpConnect()
+R version 2.12.2 (2011-02-25) 
+rJava Version 0.8-8 
+RBloomberg Version 0.4-148 
+Java environment initialized successfully.
+Looking for most recent blpapi3.jar file...
+Adding C:\blp\API\APIv3\JavaAPI\v3.4.1.3\lib\blpapi3.jar to Java classpath
+Bloomberg API Version 3.4.1.3 
+&gt; bdp(conn, ""EURUSD Curncy"", ""Last Price"")
+              Last Price
+EURUSD Curncy     1.4575
+</code></pre>
+
+<p>So as you can see I can get the EURUSD exchange rate easily. But how can I make a variable <em>subscribe</em> to the EURUSD Curncy Last_price so that the variable updates itself in real time for the current value, rather than always re-running bdp(conn, ""EURUSD Curncy"", ""last price"")? Could I do something like this?</p>
+
+<pre><code>&gt; eurusd &lt;- bdp(conn, ""EURUSD Curncy"", ""Last Price"")
+&gt; eurusd
+              Last Price
+EURUSD Curncy     1.4575
+</code></pre>
+
+<p>so that whenever I type eurusd I get the <em>latest</em> exchange rate and not the one from when I initialised the variable? Right now this does not seem to work (just has the same value in it all the time even after the exchange rate has changed). </p>
+
+<pre><code>&gt; eurusd
+              Last Price
+EURUSD Curncy     1.4575
+&gt; eurusd
+              Last Price
+EURUSD Curncy     1.4575
+&gt; eurusd &lt;- bdp(conn, ""EURUSD Curncy"", ""Last Price"")
+&gt; eurusd
+              Last Price
+EURUSD Curncy     1.4578
+&gt; 
+</code></pre>
+
+<p>Basically, can R do what Excel does, which is to have a cell which always has the latest value of EURUSD in it, without constantly running bdp to update the variable?</p>",25/04/2011 21:05,0,7628179,"<p>eventually bb will make you get a data license if you keep hitting the item request limits which they do monitor. unfortunately the data license is only static data. if you really want more then you have to go with bpipe.  </p>
+",2/10/2011 17:57,1,<r><bloomberg>,4,Error Handling and Code Debugging,"[(0, np.float32(0.37501323)), (2, np.float32(0.013245405)), (4, np.float32(0.4296789)), (5, np.float32(0.11611366)), (6, np.float32(0.05341398))]",BLOOM,4,['BLOOM'],1,eventually bb will make you get a data license if you keep hitting the item request limits which they do monitor. unfortunately the data license is only static data. if you really want more then you have to go with bpipe.,Data preparation,Deployment and Ongoing maintenance,Deployment,lifecycle,TRUE
+7660971,Click RefreshWorkbook on Bloomberg Ribbon,"<blockquote>
+  <p><strong>Possible Duplicate:</strong><br>
+  <a href=""https://stackoverflow.com/questions/12856979/how-to-refresh-load-rtd-bloomberg-function-bdh-in-excel-in-vba"">How to refresh/load RTD Bloomberg function (BDH) in excel in vba</a>  </p>
+</blockquote>
+
+
+
+<p>I am working on an Excel Spreadsheet with VBA. I have a Bloomberg BDH function that I want to refresh from VBA. I tried recording a macro and clicking the Bloomberg->Refresh Workbooks button but the macro came up empty. How can I do this from code? I'm using Excel 2007 and I found one option of entering</p>
+
+<p><code>Application.Run ""blpmain.xla!RefreshAllStaticData""</code><br>
+but blpmain.xla can't be found. I'm not sure what version of Excel/BBG-Addin this was for. </p>
+
+<p>Any help?</p>",5/10/2011 12:01,1,7662735,"<p>what i ended up doing was re-pasting down the bloomberg formulas in the appropriate ranges. this forced the data to redownload. not the most ideal solution but it works.</p>
+",5/10/2011 14:16,2,<excel><vba><bloomberg>,4,Error Handling and Code Debugging,"[(0, np.float32(0.12862514)), (4, np.float32(0.71834695)), (5, np.float32(0.066470586)), (10, np.float32(0.058709532))]",BLOOM,4,['BLOOM'],1,what i ended up doing was re-pasting down the bloomberg formulas in the appropriate ranges. this forced the data to redownload. not the most ideal solution but it works.,Data preparation,Data preparation,Maintenance ,lifecycle,FALSE
+,,,,,,,,,,,,,,,,,,,,,,8

@@ -1,0 +1,13 @@
+Topic Name,Practical Programming Issues
+User Queries and API-Based Interactions,"Integrating NLP/chatbot APIs into applications, handling user interactions, managing intents and responses, and connecting conversational systems to external applications."
+Text Analysis and Information Extraction,"Extracting structured information from unstructured text using techniques such as named entity recognition (NER), web crawling, information retrieval, and document analysis."
+NLP Pipelines and Tokenisation with spaCy,"Building and configuring NLP processing pipelines, parsing structured data, performing tokenisation, dependency parsing, and integrating NLP outputs with search or logging systems."
+"Python Environment, Files, and Package Management","Installing NLP libraries, resolving package dependencies, managing Python environments, handling datasets and file structures, and troubleshooting installation or compatibility issues."
+Error Handling and Code Debugging,"Identifying and resolving programming errors, fixing runtime exceptions, debugging NLP code, and correcting implementation mistakes during development."
+Data Structures and Output Formatting,"Processing and transforming data structures such as JSON, lists, dictionaries, and arrays, while formatting outputs for downstream NLP tasks or applications."
+General Programming and Language Usage Questions,"Applying general programming concepts, understanding language syntax, implementing algorithms, and solving common coding problems that support NLP development."
+Training Transformer-Based Language Models,"Fine-tuning and training transformer models (e.g., BERT), preparing datasets, configuring training parameters, and improving model performance for NLP tasks."
+Part-of-Speech Tagging and Linguistic Annotation,"Working with linguistic annotations including POS tags, dependency labels, syntactic parsing, and grammatical feature extraction for language analysis."
+Neural Network Implementation and PyTorch Configuration,"Implementing deep learning models in PyTorch, configuring neural network architectures, managing tensors and GPUs, and resolving training or model configuration issues."
+Game AI and Search Algorithms (Minimax),"Implementing search-based algorithms such as Minimax and related decision-making techniques, including recursion, evaluation functions, and AI optimisation."
+Vector Representations and Document Similarity,"Creating and using word/document embeddings, computing similarity between texts, generating vector representations, and applying semantic search or document retrieval techniques."

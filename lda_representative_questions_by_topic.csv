@@ -1,0 +1,1754 @@
+Topic,TopicID,Representative Question
+User Queries and API-Based Interactions,0,"<p>I am new to DialogFlow. From my default welcome intent, how do I ask a yes or no questions, and you use the reply to get to the next intent?</p>
+"
+User Queries and API-Based Interactions,0,"<p>Currently started my journey with Dialogflow,is it possible to display the message from the chatbot into my android app per API?</p>
+"
+User Queries and API-Based Interactions,0,"<p>Currently started my journey with Dialogflow,is it possible to display the message from the chatbot into my android app per API?</p>
+"
+Text Analysis and Information Extraction,1,"<p>We have a task of identifying which company a news article is about. The input is a (business) news article, the goal is the company name. </p>
+
+<p>Could recommend a solution, please?</p>
+
+<p>At the moment, we start with finding the N most mentioned company names in the article (by a Named Entity Recognition algorithm). When N >= 2, NER results can give us >75% accuracy. But when N = 1, this only give us about 50% accuracy.</p>
+"
+Text Analysis and Information Extraction,1,"<p>I want to crawl for specific things. Specifically events that are taking place like concerts, movies, art gallery openings, etc, etc. Anything that one might spend time going to.</p>
+
+<p>How do I implement a crawler?</p>
+
+<p>I have heard of Grub (grub.org -> Wikia) and Heritix (<a href=""http://crawler.archive.org/"" rel=""noreferrer"">http://crawler.archive.org/</a>)</p>
+
+<p>Are there others?</p>
+
+<p>What opinions does everyone have?</p>
+
+<p>-Jason</p>
+"
+Text Analysis and Information Extraction,1,"<p>I want to crawl for specific things. Specifically events that are taking place like concerts, movies, art gallery openings, etc, etc. Anything that one might spend time going to.</p>
+
+<p>How do I implement a crawler?</p>
+
+<p>I have heard of Grub (grub.org -> Wikia) and Heritix (<a href=""http://crawler.archive.org/"" rel=""noreferrer"">http://crawler.archive.org/</a>)</p>
+
+<p>Are there others?</p>
+
+<p>What opinions does everyone have?</p>
+
+<p>-Jason</p>
+"
+NLP Pipelines and Tokenisation with spaCy,2,"<p>I want to extract fields from list of json</p>
+<pre class=""lang-json prettyprint-override""><code>[
+  {
+    &quot;ExecMainStartTimestamp&quot;: &quot;Wed 2021-10-27 11:31:36 UTC&quot;,
+    &quot;hostname&quot;: &quot;i-XX&quot;,
+    &quot;_time&quot;: &quot;2021-10-27 12:20:01&quot;,
+    &quot;ASG&quot;: &quot;prod1&quot;,
+    &quot;ExecMainPID&quot;: &quot;1447&quot;,
+    &quot;Names&quot;: &quot;nginx.service&quot;,
+    &quot;LoadState&quot;: &quot;loaded&quot;,
+    &quot;ActiveState&quot;: &quot;active&quot;,
+    &quot;UnitFileState&quot;: &quot;enabled&quot;
+  },
+  {
+    &quot;ExecMainStartTimestamp&quot;: &quot;Wed 2021-10-27 11:31:46 UTC&quot;,
+    &quot;hostname&quot;: &quot;i-XX&quot;,
+    &quot;_time&quot;: &quot;2021-10-27 12:20:01&quot;,
+    &quot;ASG&quot;: &quot;prod1&quot;,
+    &quot;ExecMainPID&quot;: &quot;1669&quot;,
+    &quot;Names&quot;: &quot;gunicorn.service&quot;,
+    &quot;LoadState&quot;: &quot;loaded&quot;,
+    &quot;ActiveState&quot;: &quot;active&quot;,
+    &quot;UnitFileState&quot;: &quot;enabled&quot;
+  }
+]
+</code></pre>
+<p>Can someone help me to do this in datadog grok pipeline?</p>
+"
+NLP Pipelines and Tokenisation with spaCy,2,"<p>I've indexed this in Solr:</p>
+<pre class=""lang-json prettyprint-override""><code>[
+  {
+    &quot;title&quot;: &quot;Republican Party Platform of 1896&quot;,
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;genre&quot;: &quot;written&quot;,
+    &quot;date&quot;: &quot;1896-06-18&quot;,
+    &quot;author&quot;: &quot;Republican Party Platforms&quot;,
+    &quot;body&quot;: &quot;The quick fox jumped. I knew the girl singing in the room. The girl is singing in the room. &quot;,
+    &quot;sentences&quot;: [
+      {
+        &quot;sentence&quot;: &quot;The quick fox jumped.&quot;,
+        &quot;parsed&quot;: [
+          {
+            &quot;lemma&quot;: &quot;the&quot;,
+            &quot;pos&quot;: &quot;DT&quot;,
+            &quot;originalText&quot;: &quot;The&quot;,
+            &quot;dep&quot;: &quot;det&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;quick&quot;,
+            &quot;pos&quot;: &quot;JJ&quot;,
+            &quot;originalText&quot;: &quot;quick&quot;,
+            &quot;dep&quot;: &quot;amod&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;fox&quot;,
+            &quot;pos&quot;: &quot;NN&quot;,
+            &quot;originalText&quot;: &quot;fox&quot;,
+            &quot;dep&quot;: &quot;nsubj&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;jump&quot;,
+            &quot;pos&quot;: &quot;VBD&quot;,
+            &quot;originalText&quot;: &quot;jumped&quot;,
+            &quot;dep&quot;: &quot;ROOT&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;.&quot;,
+            &quot;pos&quot;: &quot;.&quot;,
+            &quot;originalText&quot;: &quot;.&quot;,
+            &quot;dep&quot;: &quot;punct&quot;
+          }
+        ]
+      },
+      {
+        &quot;sentence&quot;: &quot;I knew the girl singing in the room.&quot;,
+        &quot;parsed&quot;: [
+          {
+            &quot;lemma&quot;: &quot;I&quot;,
+            &quot;pos&quot;: &quot;PRP&quot;,
+            &quot;originalText&quot;: &quot;I&quot;,
+            &quot;dep&quot;: &quot;nsubj&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;know&quot;,
+            &quot;pos&quot;: &quot;VBD&quot;,
+            &quot;originalText&quot;: &quot;knew&quot;,
+            &quot;dep&quot;: &quot;ROOT&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;the&quot;,
+            &quot;pos&quot;: &quot;DT&quot;,
+            &quot;originalText&quot;: &quot;the&quot;,
+            &quot;dep&quot;: &quot;det&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;girl&quot;,
+            &quot;pos&quot;: &quot;NN&quot;,
+            &quot;originalText&quot;: &quot;girl&quot;,
+            &quot;dep&quot;: &quot;dobj&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;singe&quot;,
+            &quot;pos&quot;: &quot;VBG&quot;,
+            &quot;originalText&quot;: &quot;singing&quot;,
+            &quot;dep&quot;: &quot;acl&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;in&quot;,
+            &quot;pos&quot;: &quot;IN&quot;,
+            &quot;originalText&quot;: &quot;in&quot;,
+            &quot;dep&quot;: &quot;prep&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;the&quot;,
+            &quot;pos&quot;: &quot;DT&quot;,
+            &quot;originalText&quot;: &quot;the&quot;,
+            &quot;dep&quot;: &quot;det&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;room&quot;,
+            &quot;pos&quot;: &quot;NN&quot;,
+            &quot;originalText&quot;: &quot;room&quot;,
+            &quot;dep&quot;: &quot;pobj&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;.&quot;,
+            &quot;pos&quot;: &quot;.&quot;,
+            &quot;originalText&quot;: &quot;.&quot;,
+            &quot;dep&quot;: &quot;punct&quot;
+          }
+        ]
+      },
+      {
+        &quot;sentence&quot;: &quot;The girl is singing in the room.&quot;,
+        &quot;parsed&quot;: [
+          {
+            &quot;lemma&quot;: &quot;the&quot;,
+            &quot;pos&quot;: &quot;DT&quot;,
+            &quot;originalText&quot;: &quot;The&quot;,
+            &quot;dep&quot;: &quot;det&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;girl&quot;,
+            &quot;pos&quot;: &quot;NN&quot;,
+            &quot;originalText&quot;: &quot;girl&quot;,
+            &quot;dep&quot;: &quot;nsubj&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;be&quot;,
+            &quot;pos&quot;: &quot;VBZ&quot;,
+            &quot;originalText&quot;: &quot;is&quot;,
+            &quot;dep&quot;: &quot;aux&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;singe&quot;,
+            &quot;pos&quot;: &quot;VBG&quot;,
+            &quot;originalText&quot;: &quot;singing&quot;,
+            &quot;dep&quot;: &quot;ROOT&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;in&quot;,
+            &quot;pos&quot;: &quot;IN&quot;,
+            &quot;originalText&quot;: &quot;in&quot;,
+            &quot;dep&quot;: &quot;prep&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;the&quot;,
+            &quot;pos&quot;: &quot;DT&quot;,
+            &quot;originalText&quot;: &quot;the&quot;,
+            &quot;dep&quot;: &quot;det&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;room&quot;,
+            &quot;pos&quot;: &quot;NN&quot;,
+            &quot;originalText&quot;: &quot;room&quot;,
+            &quot;dep&quot;: &quot;pobj&quot;
+          },
+          {
+            &quot;lemma&quot;: &quot;.&quot;,
+            &quot;pos&quot;: &quot;.&quot;,
+            &quot;originalText&quot;: &quot;.&quot;,
+            &quot;dep&quot;: &quot;punct&quot;
+          }
+        ]
+      }
+    ]
+  }
+]
+</code></pre>
+<p>The schema is this:</p>
+<pre class=""lang-xml prettyprint-override""><code>&lt;schema name=&quot;my_schema&quot; version=&quot;1.6&quot;&gt;
+  &lt;field name=&quot;id&quot; type=&quot;string&quot; indexed=&quot;true&quot; stored=&quot;true&quot; required=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;title&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;language&quot; type=&quot;string&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;genre&quot; type=&quot;string&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;date&quot; type=&quot;tdate&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;author&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;body&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;false&quot; /&gt;
+  &lt;field name=&quot;sentences&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;true&quot; multiValued=&quot;true&quot; /&gt;
+  &lt;field name=&quot;lemma&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;false&quot; multiValued=&quot;true&quot; /&gt;
+  &lt;field name=&quot;pos&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;false&quot; multiValued=&quot;true&quot; /&gt;
+  &lt;field name=&quot;originalText&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;false&quot; multiValued=&quot;true&quot; /&gt;
+  &lt;field name=&quot;dep&quot; type=&quot;text_general&quot; indexed=&quot;true&quot; stored=&quot;false&quot; multiValued=&quot;true&quot; /&gt;
+  &lt;uniqueKey&gt;id&lt;/uniqueKey&gt;
+&lt;/schema&gt;
+</code></pre>
+<p>When I sent a query <code>http://192.168.2.10:8983/solr/#/test/query?q=*:*&amp;q.op=OR&amp;indent=true&amp;useParams=</code>, I got this:</p>
+<pre class=""lang-json prettyprint-override""><code>{
+  &quot;responseHeader&quot;:{
+    &quot;status&quot;:0,
+    &quot;QTime&quot;:0,
+    &quot;params&quot;:{
+      &quot;q&quot;:&quot;*:*&quot;,
+      &quot;indent&quot;:&quot;true&quot;,
+      &quot;q.op&quot;:&quot;OR&quot;,
+      &quot;useParams&quot;:&quot;&quot;,
+      &quot;_&quot;:&quot;1685809108520&quot;}},
+  &quot;response&quot;:{&quot;numFound&quot;:1,&quot;start&quot;:0,&quot;numFoundExact&quot;:true,&quot;docs&quot;:[
+      {
+        &quot;title&quot;:&quot;Republican Party Platform of 1896&quot;,
+        &quot;language&quot;:&quot;en&quot;,
+        &quot;region&quot;:[&quot;US&quot;],
+        &quot;genre&quot;:&quot;written&quot;,
+        &quot;date&quot;:&quot;1896-06-18T00:00:00Z&quot;,
+        &quot;author&quot;:&quot;Republican Party Platforms&quot;,
+        &quot;body&quot;:&quot;The quick fox jumped. I knew the girl singing in the room. The girl is singing in the room. &quot;,
+        &quot;sentences.sentence&quot;:[&quot;The quick fox jumped.&quot;,
+          &quot;I knew the girl singing in the room.&quot;,
+          &quot;The girl is singing in the room.&quot;],
+        &quot;sentences.parsed.lemma&quot;:[&quot;the&quot;,
+          &quot;quick&quot;,
+          &quot;fox&quot;,
+          &quot;jump&quot;,
+          &quot;.&quot;,
+          &quot;I&quot;,
+          &quot;know&quot;,
+          &quot;the&quot;,
+          &quot;girl&quot;,
+          &quot;singe&quot;,
+          &quot;in&quot;,
+          &quot;the&quot;,
+          &quot;room&quot;,
+          &quot;.&quot;,
+          &quot;the&quot;,
+          &quot;girl&quot;,
+          &quot;be&quot;,
+          &quot;singe&quot;,
+          &quot;in&quot;,
+          &quot;the&quot;,
+          &quot;room&quot;,
+          &quot;.&quot;],
+        &quot;sentences.parsed.pos&quot;:[&quot;DT&quot;,
+          &quot;JJ&quot;,
+          &quot;NN&quot;,
+          &quot;VBD&quot;,
+          &quot;.&quot;,
+          &quot;PRP&quot;,
+          &quot;VBD&quot;,
+          &quot;DT&quot;,
+          &quot;NN&quot;,
+          &quot;VBG&quot;,
+          &quot;IN&quot;,
+          &quot;DT&quot;,
+          &quot;NN&quot;,
+          &quot;.&quot;,
+          &quot;DT&quot;,
+          &quot;NN&quot;,
+          &quot;VBZ&quot;,
+          &quot;VBG&quot;,
+          &quot;IN&quot;,
+          &quot;DT&quot;,
+          &quot;NN&quot;,
+          &quot;.&quot;],
+        &quot;sentences.parsed.originalText&quot;:[&quot;The&quot;,
+          &quot;quick&quot;,
+          &quot;fox&quot;,
+          &quot;jumped&quot;,
+          &quot;.&quot;,
+          &quot;I&quot;,
+          &quot;knew&quot;,
+          &quot;the&quot;,
+          &quot;girl&quot;,
+          &quot;singing&quot;,
+          &quot;in&quot;,
+          &quot;the&quot;,
+          &quot;room&quot;,
+          &quot;.&quot;,
+          &quot;The&quot;,
+          &quot;girl&quot;,
+          &quot;is&quot;,
+          &quot;singing&quot;,
+          &quot;in&quot;,
+          &quot;the&quot;,
+          &quot;room&quot;,
+          &quot;.&quot;],
+        &quot;sentences.parsed.dep&quot;:[&quot;det&quot;,
+          &quot;amod&quot;,
+          &quot;nsubj&quot;,
+          &quot;ROOT&quot;,
+          &quot;punct&quot;,
+          &quot;nsubj&quot;,
+          &quot;ROOT&quot;,
+          &quot;det&quot;,
+          &quot;dobj&quot;,
+          &quot;acl&quot;,
+          &quot;prep&quot;,
+          &quot;det&quot;,
+          &quot;pobj&quot;,
+          &quot;punct&quot;,
+          &quot;det&quot;,
+          &quot;nsubj&quot;,
+          &quot;aux&quot;,
+          &quot;ROOT&quot;,
+          &quot;prep&quot;,
+          &quot;det&quot;,
+          &quot;pobj&quot;,
+          &quot;punct&quot;],
+        &quot;id&quot;:&quot;be5360b5-daef-4645-afe2-752a43b93628&quot;,
+        &quot;_version_&quot;:1767700593829216256}]
+  }}
+</code></pre>
+<p>As part of NLP research work, I need to find out the dep labels the word &quot;singe&quot; has been assigned, which should be two, e.g. <code>&quot;ROOT&quot;</code> in &quot;The girl is singing in the room.&quot;, and <code>&quot;acl&quot;</code> in &quot;I knew the girl singing in the room.&quot;. How should I compose a query in Solr?</p>
+<p>I tried this:</p>
+<pre><code>http://192.168.2.10:8983/solr/test/select?q=sentences.parsed.lemma:singe&amp;fl=sentences.parsed.dep&amp;rows=100
+</code></pre>
+<p>and only got this:</p>
+<pre class=""lang-json prettyprint-override""><code>{
+  &quot;responseHeader&quot;: {
+    &quot;status&quot;: 0,
+    &quot;QTime&quot;: 3,
+    &quot;params&quot;: {
+      &quot;q&quot;: &quot;sentences.parsed.lemma:singe&quot;,
+      &quot;fl&quot;: &quot;sentences.parsed.dep&quot;,
+      &quot;rows&quot;: &quot;100&quot;
+    }
+  },
+  &quot;response&quot;: {
+    &quot;numFound&quot;: 1,
+    &quot;start&quot;: 0,
+    &quot;numFoundExact&quot;: true,
+    &quot;docs&quot;: [
+      {
+        &quot;sentences.parsed.dep&quot;: [
+          &quot;det&quot;,
+          &quot;amod&quot;,
+          &quot;nsubj&quot;,
+          &quot;ROOT&quot;,
+          &quot;punct&quot;,
+          &quot;nsubj&quot;,
+          &quot;ROOT&quot;,
+          &quot;det&quot;,
+          &quot;dobj&quot;,
+          &quot;acl&quot;,
+          &quot;prep&quot;,
+          &quot;det&quot;,
+          &quot;pobj&quot;,
+          &quot;punct&quot;,
+          &quot;det&quot;,
+          &quot;nsubj&quot;,
+          &quot;aux&quot;,
+          &quot;ROOT&quot;,
+          &quot;prep&quot;,
+          &quot;det&quot;,
+          &quot;pobj&quot;,
+          &quot;punct&quot;
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+"
+NLP Pipelines and Tokenisation with spaCy,2,"<p>I am attempting to parse the output of an Azure AVD log in datadog.</p>
+<p>The entrypoint is: @properties.SessionHostHealthCheckResult
+which contains:</p>
+<pre class=""lang-json prettyprint-override""><code>[{&quot;HealthCheckName&quot;:0,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:24:35.1223414Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:1,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:24:38.8314715Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:3,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;SessionHost healthy: SessionHost healthy: SxS stack listener is ready&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:24:55.0444313Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:4,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;{\&quot;AccessibleUrls\&quot;:[\&quot;77be962a-38cb-49da-9cd6-e4d1a7eff6e0.rdbroker-g-us-r1.wvd.microsoft.com\&quot;,\&quot;77be962a-38cb-49da-9cd6-e4d1a7eff6e0.rdbroker.wvd.microsoft.com\&quot;,\&quot;77be962a-38cb-49da-9cd6-e4d1a7eff6e0.rddiagnostics-g-us-r1.wvd.microsoft.com\&quot;,\&quot;rdgateway-host-notgreen-c223-wus2-r1.wvd.microsoft.com\&quot;,\&quot;mrsglobalsteus2prod.blob.core.windows.net\&quot;,\&quot;gcs.prod.monitoring.core.windows.net\&quot;,\&quot;centralus-shared.prod.warm.ingest.monitor.core.windows.net\&quot;,\&quot;centralus-qos.prod.warm.ingest.monitor.core.windows.net\&quot;],\&quot;NotAccessibleUrls\&quot;:null,\&quot;Context\&quot;:null}&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:24:59.6074422Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:5,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;Located running process at C:\\Program Files\\Microsoft RDInfra\\RDMonitoringAgent_46.24.3\\Agent\\MonAgentLauncher.exe&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:09:38.5695095Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:9,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;{\r\n  \&quot;Details\&quot;: \&quot;IMDS pressumed available\&quot;,\r\n  \&quot;AzureResourceId\&quot;: \&quot;/subscriptions/BCENP/resourceGroups/A3VDVDIRSG02D/providers/Microsoft.Compute/virtualMachines/AZBBBBB001-124\&quot;,\r\n  \&quot;VmId\&quot;: \&quot;12a133b5-d0d8-46a4-b7e6-6e638b434de1\&quot;\r\n}&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:24:40.0460691Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:10,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;SessionHost healthy: MSIX packages have been properly staged&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:29:12.8268026Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:11,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;NAT shape is Symetric when probing [turn:51.5.255.240:3478?Udp]\nTURN relay health check for server [turn:51.5.255.240:3478?Udp] succeeded\n&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:31:43.118842Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false},{&quot;HealthCheckName&quot;:19,&quot;HealthCheckResult&quot;:1,&quot;AdditionalFailureDetails&quot;:{&quot;Message&quot;:&quot;SessionHost healthy: Microsoft Entra ID Join check succeeded. DeviceId: 96a3c0af-5f42-49a1-8ad2-e05f9c948b41.&quot;,&quot;ErrorCode&quot;:0,&quot;LastHealthCheckInUTC&quot;:&quot;2025-11-07T01:24:55.3126206Z&quot;},&quot;AdditionalDetails&quot;:null,&quot;IsProvisioningHealthCheck&quot;:false}]
+</code></pre>
+<p>I have attempted a few different ways to attempt to process it but it always comes out not as I want.
+Here is an example:</p>
+<p><strong>Grok Parser string</strong></p>
+<pre><code>rule %{data::keyvalue(&quot;:&quot;,&quot;&quot;,&quot;&quot;)} 
+</code></pre>
+<p><strong>Results:</strong></p>
+<pre><code>{
+  &quot;HealthCheckName&quot;: [
+    0,
+    1,
+    3,
+    4,
+    5,
+    9,
+    10,
+    11,
+    19
+  ],
+  &quot;IsProvisioningHealthCheck&quot;: [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  &quot;Message&quot;: [
+    &quot;SessionHost healthy: SessionHost healthy: SxS stack listener is ready&quot;,
+    &quot;Located running process at C:\\\\Program Files\\\\Microsoft RDInfra\\\\RDMonitoringAgent_46.24.3\\\\Agent\\\\MonAgentLauncher.exe&quot;,
+    &quot;SessionHost healthy: MSIX packages have been properly staged&quot;,
+    &quot;NAT shape is Symetric when probing [turn:51.5.255.240:3478?Udp]\\nTURN relay health check for server [turn:51.5.255.240:3478?Udp] succeeded\\n&quot;,
+    &quot;SessionHost healthy: Microsoft Entra ID Join check succeeded. DeviceId: 4629425d-2650-47d4-875e-9b222eecd700.&quot;
+  ],
+  &quot;LastHealthCheckInUTC&quot;: [
+    &quot;2025-11-07T01:24:35.1223414Z&quot;,
+    &quot;2025-11-07T01:24:38.8314715Z&quot;,
+    &quot;2025-11-07T01:24:55.0444313Z&quot;,
+    &quot;2025-11-07T01:24:59.6074422Z&quot;,
+    &quot;2025-11-07T01:09:38.5695095Z&quot;,
+    &quot;2025-11-07T01:24:40.0460691Z&quot;,
+    &quot;2025-11-07T01:29:12.8268026Z&quot;,
+    &quot;2025-11-07T01:31:43.118842Z&quot;,
+    &quot;2025-11-07T01:24:55.3126206Z&quot;
+  ],
+  &quot;HealthCheckResult&quot;: [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  &quot;ErrorCode&quot;: [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}
+</code></pre>
+<p>I believe I am looking for something where each health check is self contained.</p>
+<p>Something like this:</p>
+<pre class=""lang-json prettyprint-override""><code>[
+  {
+    &quot;HealthCheckName&quot;: 0,
+    &quot;IsProvisioningHealthCheck&quot;: 0,
+    &quot;Message&quot;: &quot;SessionHost healthy: SessionHost healthy: SxS stack listener is ready&quot;,
+    &quot;LastHealthCheckInUTC&quot;: &quot;2025-11-07T01:24:35.1223414Z&quot;,
+    &quot;HealthCheckResult&quot;: 0,
+    &quot;ErrorCode&quot;: 0
+  },
+  {
+    &quot;HealthCheckName&quot;: 1,
+    &quot;IsProvisioningHealthCheck&quot;: 1,
+    &quot;Message&quot;: &quot;SessionHost healthy: MSIX packages have been properly staged&quot;,
+    &quot;LastHealthCheckInUTC&quot;: &quot;2025-11-07T01:29:12.8268026Z&quot;,
+    &quot;HealthCheckResult&quot;: 1,
+    &quot;ErrorCode&quot;: 1
+  }
+]
+</code></pre>
+<p>Then this would repeat for any number of these in the <code>@properties.SessionHostHealthCheckResult</code></p>
+<p><strong>Additional Note</strong></p>
+<p>I did attempt another grok method manually doing it with no luck of course:</p>
+<pre class=""lang-none prettyprint-override""><code>HealthCheckName .+\{\&quot;HealthCheckName\&quot;\:%{integer:health_check.name}\,\&quot;HealthCheckResult&quot;\:%{integer:health_check.result}\,\&quot;AdditionalFailureDetails\&quot;\:\{&quot;Message&quot;:&quot;&quot;,&quot;ErrorCode&quot;:%{integer:health_check.error_code}\,\&quot;LastHealthCheckInUTC\&quot;\:\&quot;%{date(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'&quot;):health_check.date}\&quot;\}\,\&quot;AdditionalDetails\&quot;\:%{data:health_check.additional_data}\,\&quot;IsProvisioningHealthCheck\&quot;\:%{boolean:health_check.is_provisioning_health_check}\}\,.+ 
+</code></pre>
+"
+"Python Environment, Files, and Package Management",3,"<p>I have a folder that contains 7 sub folder and each sub folder contains 8 files. Generally I have 56 files for the train set. For the test set, I have a folder that contains 7 sub folders and each sub folder contains 2 files (generally 14 files for the test set). I have another file which contains 1000 most common words of the train set. I have to check if these 1000 words are in the train set or no. If they exist there, it should return +1, else it should return -1 to make a vector.Then I have to classify the texts with bipolar perceptron (neural network). The threshold is, 0.1 and the learning rate is, 0.5. The part after assigning the weights doesn't work well. how can I change the code?</p>
+
+<pre><code>import os
+file=""c:/python34/1000CommonWords.txt""
+folder_path=""c:/python34/train""
+def vector (folder_path, file):
+    t=[]   
+    vector=[]
+    vector2=[]
+    m=[]
+
+    for folder in sorted(os.listdir(folder_path)):
+        folder_path1 = os.path.join(folder_path, folder)
+        for folder1 in sorted(os.listdir(folder_path1)):
+            file=os.path.join(folder_path1, folder1)
+            tex = open(file,encoding=""utf-8"") 
+            tex=tex.read().split()
+            t=tex+t
+
+
+
+
+
+
+        with open (file, encoding=""utf-8"") as f1:
+            f1=f1.read().split()
+
+
+            for c in t:      # to make the [1, -1] vector
+               for i in c:
+                    for j in f1:
+                        if j in i:
+                            m.append (+1)
+                        else:
+                            m.append (-1)
+                    vector.append(m)
+                    vector2.append(vector)
+                    #return vector2
+
+                    w=[[0 for row in range(len(vector2[0][0] ))] for clmn in range(7)]   # weights
+                    b=[0 for wb in range(7)]   # bias
+                    l=0
+                    while l&lt;=1000:
+                        w_old=w[:]
+                        b_old=b[:]
+                        for Class in vector2:
+                            for text in Class:
+                                node=0
+                                while node&lt;7:
+                                    i=0
+                                    y_in=0
+                                    while i&lt;len(text):
+                                        y_in= text[i]*w[node][i]
+                                        i+=1
+                                        y_in=b[node]+y_in
+                                        if y_in&lt;=-0.1:  # activatin function
+                                            y=-1
+                                        elif (y_in &lt;=0.1 and y_in&gt;=-0.1):
+                                            y=0
+                                        else:
+                                            y=1
+
+                                        if node==vector2.index(Class):
+                                            target=1  # assign target
+                                        else:
+                                            target=-1
+
+                                        if target!=y:
+                                            for j in range(0,len(w[0])): # update weights
+                                                w[node][j]=w[nod][j]+0.5*text[j]*target
+                                                b[node]=b[node]+0.5*target
+                                              #  print(len(w)) 
+                                               # print(len(w[0]))
+                                                node+=1
+                                                l+=1
+                                                print (w)
+                                                print(b)
+</code></pre>
+
+<p>the folders name:(the language is persian)</p>
+
+<p>['اجتماعی', 'اديان', 'اقتصادی', 'سیاسی', 'فناوري', 'مسائل راهبردي ايران', 'ورزشی']</p>
+
+<p>Each folder contains these files:</p>
+
+<p>['13810320-txt-0132830_utf.txt', '13810821-txt-0172902_utf.txt', '13830627-txt-0431835_utf.txt', '13850502-txt-0751465_utf.txt', '13850506-txt-0754145_utf.txt', '13850723-txt-0802407_utf.txt', '13860630-txt-1002033_utf.txt', '13870730-txt-1219770_utf.txt']
+['13860431-txt-0963964_utf.txt', '13860616-txt-0992811_utf.txt', '13860625-txt-0997674_utf.txt', '13860722-txt-1013944_utf.txt', '13860802-txt-1021550_utf.txt', '13870329-txt-1149735_utf.txt', '13870903-txt-1240455_utf.txt', '13871001-txt-1256894_utf.txt']
+['13860321-txt-0940314_utf.txt', '13860930-txt-1055987_utf.txt', '13870504-txt-1169324_utf.txt', '13880223-txt-1337283_utf.txt', '13890626-txt-1614537_utf.txt', '13891005-txt-1681151_utf.txt', '13891025-txt-1694816_utf.txt', '13891224-txt-1732745_utf.txt']
+['13821109-txt-0342352_utf.txt', '13840501-txt-0558076_utf.txt', '13840725-txt-0599073_utf.txt', '13850728-txt-0809843_utf.txt', '13850910-txt-0834263_utf.txt', '13871015-txt-1264594_utf.txt', '13880304-txt-1345179_utf.txt', '13890531-txt-1596470_utf.txt']
+['13850816-txt-0807093_utf.txt', '13850903-txt-0830601_utf.txt', '13851012-txt-0853818_utf.txt', '13870605-txt-1185666_utf.txt', '13890301-txt-1542795_utf.txt', '13890626-txt-1614287_utf.txt', '13890716-txt-1628932_utf.txt', '13900115-txt-1740412_utf.txt']
+['13870521-txt-1177039_utf.txt', '13870706-txt-1196885_utf.txt', '13870911-txt-1220118_utf.txt', '13871029-txt-1273519_utf.txt', '13880118-txt-1312303_utf.txt', '13880303-txt-1202027_utf.txt', '13880330-txt-1132374_utf.txt', '13880406-txt-1360964_utf.txt']
+['13840803-txt-0602704_utf.txt', '13841026-txt-0651073_utf.txt', '13880123-txt-1315587_utf.txt', '13880205-txt-1324336_utf.txt', '13880319-txt-1353520_utf.txt', '13880621-txt-1401062_utf.txt', '13890318-txt-1553380_utf.txt', '13890909-txt-1665470_utf.txt']</p>
+"
+"Python Environment, Files, and Package Management",3,"<p>I am new to this field and experimenting different models in NLP domain. While am trying to install the <a href=""https://fasttext.cc/"" rel=""nofollow noreferrer"">fastText</a> libary using the command prompt, it is showing an error:</p>
+<pre><code>pip install wheel
+pip install pybind11
+pip install fasttext
+</code></pre>
+<p>The error is:</p>
+<pre class=""lang-none prettyprint-override""><code>Collecting fasttext
+  Using cached fasttext-0.9.2.tar.gz (68 kB)
+  Preparing metadata (setup.py) ... done
+Requirement already satisfied: pybind11&gt;=2.2 in c:\users\manid\appdata\local\programs\python\python312\lib\site-packages (from fasttext) (2.11.1)
+Requirement already satisfied: setuptools&gt;=0.7.0 in c:\users\manid\appdata\local\programs\python\python312\lib\site-packages (from fasttext) (69.2.0)
+Requirement already satisfied: numpy in c:\users\manid\appdata\local\programs\python\python312\lib\site-packages (from fasttext) (1.26.4)
+Building wheels for collected packages: fasttext
+  Building wheel for fasttext (setup.py) ... error
+  error: subprocess-exited-with-error
+
+  × python setup.py bdist_wheel did not run successfully.
+  │ exit code: 1
+  ╰─&gt; [75 lines of output]
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\setuptools\dist.py:476: SetuptoolsDeprecationWarning: Invalid dash-separated options
+      !!
+
+              ********************************************************************************
+              Usage of dash-separated 'description-file' will not be supported in future
+              versions. Please use the underscore name 'description_file' instead.
+
+              By 2024-Sep-26, you need to update your project and remove deprecated calls
+              or your builds will no longer be supported.
+
+              See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+              ********************************************************************************
+
+      !!
+        opt = self.warn_dash_deprecation(opt, section)
+      running bdist_wheel
+      running build
+      running build_py
+      creating build
+      creating build\lib.win-amd64-cpython-312
+      creating build\lib.win-amd64-cpython-312\fasttext
+      copying python\fasttext_module\fasttext\FastText.py -&gt; build\lib.win-amd64-cpython-312\fasttext
+      copying python\fasttext_module\fasttext\__init__.py -&gt; build\lib.win-amd64-cpython-312\fasttext
+      creating build\lib.win-amd64-cpython-312\fasttext\util
+      copying python\fasttext_module\fasttext\util\util.py -&gt; build\lib.win-amd64-cpython-312\fasttext\util
+      copying python\fasttext_module\fasttext\util\__init__.py -&gt; build\lib.win-amd64-cpython-312\fasttext\util
+      creating build\lib.win-amd64-cpython-312\fasttext\tests
+      copying python\fasttext_module\fasttext\tests\test_configurations.py -&gt; build\lib.win-amd64-cpython-312\fasttext\tests
+      copying python\fasttext_module\fasttext\tests\test_script.py -&gt; build\lib.win-amd64-cpython-312\fasttext\tests
+      copying python\fasttext_module\fasttext\tests\__init__.py -&gt; build\lib.win-amd64-cpython-312\fasttext\tests
+      running build_ext
+      building 'fasttext_pybind' extension
+      creating build\temp.win-amd64-cpython-312
+      creating build\temp.win-amd64-cpython-312\Release
+      creating build\temp.win-amd64-cpython-312\Release\python
+      creating build\temp.win-amd64-cpython-312\Release\python\fasttext_module
+      creating build\temp.win-amd64-cpython-312\Release\python\fasttext_module\fasttext
+      creating build\temp.win-amd64-cpython-312\Release\python\fasttext_module\fasttext\pybind
+      creating build\temp.win-amd64-cpython-312\Release\src
+      &quot;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\bin\HostX86\x64\cl.exe&quot; /c /nologo /O2 /W3 /GL /DNDEBUG /MD -IC:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include -IC:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include -Isrc -IC:\Users\manid\AppData\Local\Programs\Python\Python312\include -IC:\Users\manid\AppData\Local\Programs\Python\Python312\Include &quot;-IC:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\include&quot; &quot;-IC:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\VS\include&quot; &quot;-IC:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt&quot; &quot;-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\um&quot; &quot;-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\shared&quot; &quot;-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\winrt&quot; &quot;-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\cppwinrt&quot; &quot;-IC:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um&quot; /EHsc /Tppython/fasttext_module/fasttext/pybind/fasttext_pybind.cc /Fobuild\temp.win-amd64-cpython-312\Release\python/fasttext_module/fasttext/pybind/fasttext_pybind.obj /EHsc /DVERSION_INFO=\\\&quot;0.9.2\\\&quot;
+      fasttext_pybind.cc
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): error C2065: 'ssize_t': undeclared identifier
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): error C2672: 'pybind11::init': no matching overloaded function found
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1932): note: could be 'Ret pybind11::init(CFunc &amp;&amp;,AFunc &amp;&amp;)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): note: 'pybind11::init': invalid template argument for 'CFunc', type expected
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1924): note: or       'Ret pybind11::init(Func &amp;&amp;)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): note: 'pybind11::init': invalid template argument for 'Func', type expected
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1912): note: or       'pybind11::detail::initimpl::constructor&lt;Args...&gt; pybind11::init(void)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): note: 'pybind11::init': invalid template argument for 'Args', type expected
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): error C2672: 'pybind11::class_&lt;fasttext::Vector&gt;::def': no matching overloaded function found
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1631): note: could be 'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(pybind11::detail::initimpl::pickle_factory&lt;Args...&gt; &amp;&amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1625): note: or       'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(pybind11::detail::initimpl::factory&lt;Args...&gt; &amp;&amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1618): note: or       'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(const pybind11::detail::initimpl::alias_constructor&lt;Args...&gt; &amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1611): note: or       'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(const pybind11::detail::initimpl::constructor&lt;Args...&gt; &amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1599): note: or       'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(const T &amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1574): note: or       'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(const char *,Func &amp;&amp;,const Extra &amp;...)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(171): note: 'pybind11::class_&lt;fasttext::Vector&gt; &amp;pybind11::class_&lt;fasttext::Vector&gt;::def(const char *,Func &amp;&amp;,const Extra &amp;...)': expects 3 arguments - 1 provided
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): error C2065: 'ssize_t': undeclared identifier
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): error C2065: 'ssize_t': undeclared identifier
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): error C2672: 'pybind11::init': no matching overloaded function found
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1932): note: could be 'Ret pybind11::init(CFunc &amp;&amp;,AFunc &amp;&amp;)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): note: 'pybind11::init': invalid template argument for 'CFunc', type expected
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1924): note: or       'Ret pybind11::init(Func &amp;&amp;)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): note: 'pybind11::init': invalid template argument for 'Func', type expected
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1912): note: or       'pybind11::detail::initimpl::constructor&lt;Args...&gt; pybind11::init(void)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): note: 'pybind11::init': invalid template argument for 'Args', type expected
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): error C2672: 'pybind11::class_&lt;fasttext::DenseMatrix&gt;::def': no matching overloaded function found
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1631): note: could be 'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(pybind11::detail::initimpl::pickle_factory&lt;Args...&gt; &amp;&amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1625): note: or       'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(pybind11::detail::initimpl::factory&lt;Args...&gt; &amp;&amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1618): note: or       'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(const pybind11::detail::initimpl::alias_constructor&lt;Args...&gt; &amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1611): note: or       'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(const pybind11::detail::initimpl::constructor&lt;Args...&gt; &amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1599): note: or       'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(const T &amp;,const Extra &amp;...)'
+      C:\Users\manid\AppData\Local\Programs\Python\Python312\Lib\site-packages\pybind11\include\pybind11\pybind11.h(1574): note: or       'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(const char *,Func &amp;&amp;,const Extra &amp;...)'
+      python/fasttext_module/fasttext/pybind/fasttext_pybind.cc(185): note: 'pybind11::class_&lt;fasttext::DenseMatrix&gt; &amp;pybind11::class_&lt;fasttext::DenseMatrix&gt;::def(const char *,Func &amp;&amp;,const Extra &amp;...)': expects 3 arguments - 1 provided
+      error: command 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.39.33519\\bin\\HostX86\\x64\\cl.exe' failed with exit code 2
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for fasttext
+  Running setup.py clean for fasttext
+Failed to build fasttext
+ERROR: Could not build wheels for fasttext, which is required to install pyproject.toml-based projects
+</code></pre>
+"
+"Python Environment, Files, and Package Management",3,"<p>I'm trying to set up a data pipeline between Bloomberg and Python. I have a Bloomberg terminal, a Windows 64-bit machine, Python 3.7.4 and a Sublime Text environment up and working. My goal is to install the XBBG package: <a href=""https://pypi.org/project/xbbg/"" rel=""nofollow noreferrer"">https://pypi.org/project/xbbg/</a>.</p>
+
+<p>I've followed the steps on <a href=""https://pypi.org/project/xbbg/"" rel=""nofollow noreferrer"">https://pypi.org/project/xbbg/</a> and I have installed:</p>
+
+<ul>
+<li>Bloomberg C++ SDK version 3.12.1 or higher</li>
+<li>Bloomberg Open API (need to install manually as shown below)</li>
+<li>pdblp - pandas wrapper for Bloomberg Open API</li>
+<li>numpy, pandas, ruamel.yaml</li>
+</ul>
+
+<p>However the <code>pip install pyarrow</code> installation does not work (see traceback below), even when I tried earlier versions of <code>pyarrow</code>. </p>
+
+<pre class=""lang-py prettyprint-override""><code>pip install pyarrow
+Collecting pyarrow
+  Downloading https://files.pythonhosted.org/packages/6c/75/e87ad78b3a0d1250984331e59648fac43218f00599fd570318447178c650/pyarrow-0.14.0.tar.gz (436kB)
+    100% |████████████████████████████████| 440kB 1.8MB/s
+    Complete output from command python setup.py egg_info:
+    Traceback (most recent call last):
+      File ""&lt;string&gt;"", line 1, in &lt;module&gt;
+      File ""C:\Users\AppData\Local\Temp\pip-install-r81qamg4\pyarrow\setup.py"", line 29, in &lt;module&gt;
+        from Cython.Distutils import build_ext as _build_ext
+    ModuleNotFoundError: No module named 'Cython'
+
+    ----------------------------------------
+Command ""python setup.py egg_info"" failed with error code 1 in C:\Users\AppData\Local\Temp\pip-install-r81qamg4\pyarrow\
+</code></pre>
+
+<pre class=""lang-py prettyprint-override""><code>
+So I installed Cython:
+
+pip install Cython
+Collecting Cython
+  Downloading https://files.pythonhosted.org/packages/5b/95/d0b8d1b15ddb1129b841b1c537e935dce19ae4ccf7da65ade0b37e210434/Cython-0.29.12-cp37-cp37m-win32.whl (1.6MB)
+    100% |████████████████████████████████| 1.6MB 2.1MB/s
+Installing collected packages: Cython
+Successfully installed Cython-0.29.12
+</code></pre>
+
+<p>and tried installing PyArrow again:</p>
+
+<pre class=""lang-py prettyprint-override""><code>pip install pyarrow
+Collecting pyarrow
+  Using cached https://files.pythonhosted.org/packages/6c/75/e87ad78b3a0d1250984331e59648fac43218f00599fd570318447178c650/pyarrow-0.14.0.tar.gz
+Collecting numpy&gt;=1.14 (from pyarrow)
+  Downloading https://files.pythonhosted.org/packages/07/46/656c25b39fc152ea525eef14b641993624a6325a8ae815b200de57cff0bc/numpy-1.16.4-cp37-cp37m-win32.whl (10.0MB)
+    100% |████████████████████████████████| 10.0MB 1.3MB/s
+Collecting six&gt;=1.0.0 (from pyarrow)
+  Downloading https://files.pythonhosted.org/packages/73/fb/00a976f728d0d1fecfe898238ce23f502a721c0ac0ecfedb80e0d88c64e9/six-1.12.0-py2.py3-none-any.whl
+Installing collected packages: numpy, six, pyarrow
+  Running setup.py install for pyarrow ... error
+    Complete output from command ""c:\users\alain tchibozo\appdata\local\programs\python\python37-32\python.exe"" -u -c ""import setuptools, tokenize;__file__='C:\\Users\\AppData\\Local\\Temp\\pip-install-gfndyai5\\pyarrow\\setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))"" install --record C:\Users\\AppData\Local\Temp\pip-record-xs9wfdwm\install-record.txt --single-version-externally-managed --compile:
+    c:\users\appdata\local\temp\pip-install-gfndyai5\pyarrow\.eggs\setuptools_scm-3.3.3-py3.7.egg\setuptools_scm\utils.py:119: UserWarning: 'git' was not found
+      warnings.warn(""%r was not found"" % name)
+    running install
+    running build
+    running build_py
+    creating build
+    creating build\lib.win32-3.7
+    creating build\lib.win32-3.7\pyarrow
+    copying pyarrow\benchmark.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\compat.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\csv.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\cuda.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\feather.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\filesystem.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\flight.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\hdfs.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\ipc.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\json.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\jvm.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\orc.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\pandas_compat.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\parquet.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\plasma.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\serialization.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\types.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\util.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_generated_version.py -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\__init__.py -&gt; build\lib.win32-3.7\pyarrow
+    creating build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\conftest.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\deserialize_buffer.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\pandas_examples.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\strategies.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_array.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_builder.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_compute.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_convert_builtin.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_csv.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_cuda.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_cuda_numba_interop.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_cython.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_deprecations.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_extension_type.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_feather.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_filesystem.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_flight.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_gandiva.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_hdfs.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_io.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_ipc.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_json.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_jvm.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_memory.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_misc.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_orc.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_pandas.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_parquet.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_plasma.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_plasma_tf_op.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_scalars.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_schema.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_serialization.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_strategies.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_table.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_tensor.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\test_types.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\util.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    copying pyarrow\tests\__init__.py -&gt; build\lib.win32-3.7\pyarrow\tests
+    running egg_info
+    writing pyarrow.egg-info\PKG-INFO
+    writing dependency_links to pyarrow.egg-info\dependency_links.txt
+    writing entry points to pyarrow.egg-info\entry_points.txt
+    writing requirements to pyarrow.egg-info\requires.txt
+    writing top-level names to pyarrow.egg-info\top_level.txt
+    reading manifest file 'pyarrow.egg-info\SOURCES.txt'
+    reading manifest template 'MANIFEST.in'
+    warning: no previously-included files matching '*.so' found anywhere in distribution
+    warning: no previously-included files matching '*.pyc' found anywhere in distribution
+    warning: no previously-included files matching '*~' found anywhere in distribution
+    warning: no previously-included files matching '#*' found anywhere in distribution
+    warning: no previously-included files matching '.git*' found anywhere in distribution
+    warning: no previously-included files matching '.DS_Store' found anywhere in distribution
+    no previously-included directories found matching '.asv'
+    writing manifest file 'pyarrow.egg-info\SOURCES.txt'
+    copying pyarrow\__init__.pxd -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_csv.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_cuda.pxd -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_cuda.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_flight.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_json.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_orc.pxd -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_orc.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_parquet.pxd -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_parquet.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\_plasma.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\array.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\benchmark.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\builder.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\error.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\feather.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\gandiva.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\io-hdfs.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\io.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\ipc.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\lib.pxd -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\lib.pyx -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\memory.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\pandas-shim.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\public-api.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\scalar.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\serialization.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\table.pxi -&gt; build\lib.win32-3.7\pyarrow
+    copying pyarrow\types.pxi -&gt; build\lib.win32-3.7\pyarrow
+    creating build\lib.win32-3.7\pyarrow\includes
+    copying pyarrow\includes\__init__.pxd -&gt; build\lib.win32-3.7\pyarrow\includes
+    copying pyarrow\includes\common.pxd -&gt; build\lib.win32-3.7\pyarrow\includes
+    copying pyarrow\includes\libarrow.pxd -&gt; build\lib.win32-3.7\pyarrow\includes
+    copying pyarrow\includes\libarrow_cuda.pxd -&gt; build\lib.win32-3.7\pyarrow\includes
+    copying pyarrow\includes\libarrow_flight.pxd -&gt; build\lib.win32-3.7\pyarrow\includes
+    copying pyarrow\includes\libgandiva.pxd -&gt; build\lib.win32-3.7\pyarrow\includes
+    creating build\lib.win32-3.7\pyarrow\tensorflow
+    copying pyarrow\tensorflow\plasma_op.cc -&gt; build\lib.win32-3.7\pyarrow\tensorflow
+    copying pyarrow\tests\pyarrow_cython_example.pyx -&gt; build\lib.win32-3.7\pyarrow\tests
+    creating build\lib.win32-3.7\pyarrow\tests\data
+    creating build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\README.md -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\TestOrcFile.emptyFile.jsn.gz -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\TestOrcFile.emptyFile.orc -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\TestOrcFile.test1.jsn.gz -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\TestOrcFile.test1.orc -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\TestOrcFile.testDate1900.jsn.gz -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\TestOrcFile.testDate1900.orc -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\decimal.jsn.gz -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    copying pyarrow\tests\data\orc\decimal.orc -&gt; build\lib.win32-3.7\pyarrow\tests\data\orc
+    creating build\lib.win32-3.7\pyarrow\tests\data\parquet
+    copying pyarrow\tests\data\parquet\v0.7.1.all-named-index.parquet -&gt; build\lib.win32-3.7\pyarrow\tests\data\parquet
+    copying pyarrow\tests\data\parquet\v0.7.1.column-metadata-handling.parquet -&gt; build\lib.win32-3.7\pyarrow\tests\data\parquet
+    copying pyarrow\tests\data\parquet\v0.7.1.parquet -&gt; build\lib.win32-3.7\pyarrow\tests\data\parquet
+    copying pyarrow\tests\data\parquet\v0.7.1.some-named-index.parquet -&gt; build\lib.win32-3.7\pyarrow\tests\data\parquet
+    running build_ext
+    creating build\temp.win32-3.7
+    creating build\temp.win32-3.7\Release
+    Traceback (most recent call last):
+      File ""&lt;string&gt;"", line 1, in &lt;module&gt;
+      File ""C:\Users\\AppData\Local\Temp\pip-install-gfndyai5\pyarrow\setup.py"", line 606, in &lt;module&gt;
+        url='https://arrow.apache.org/'
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\site-packages\setuptools\__init__.py"", line 145, in setup
+        return distutils.core.setup(**attrs)
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\core.py"", line 148, in setup
+        dist.run_commands()
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\dist.py"", line 966, in run_commands
+        self.run_command(cmd)
+      File ""c:\users\appdata\local\programs\python\python37-32\lib\distutils\dist.py"", line 985, in run_command
+        cmd_obj.run()
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\site-packages\setuptools\command\install.py"", line 61, in run
+        return orig.install.run(self)
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\command\install.py"", line 545, in run
+        self.run_command('build')
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\cmd.py"", line 313, in run_command
+        self.distribution.run_command(command)
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\dist.py"", line 985, in run_command
+        cmd_obj.run()
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\command\build.py"", line 135, in run
+        self.run_command(cmd_name)
+      File ""c:\users\alain\appdata\local\programs\python\python37-32\lib\distutils\cmd.py"", line 313, in run_command
+        self.distribution.run_command(command)
+      File ""c:\users\\appdata\local\programs\python\python37-32\lib\distutils\dist.py"", line 985, in run_command
+        cmd_obj.run()
+      File ""C:\Users\1\AppData\Local\Temp\pip-install-gfndyai5\pyarrow\setup.py"", line 94, in run
+        self._run_cmake()
+      File ""C:\Users\\AppData\Local\Temp\pip-install-gfndyai5\pyarrow\setup.py"", line 273, in _run_cmake
+        raise RuntimeError('Not supported on 32-bit Windows')
+    RuntimeError: Not supported on 32-bit Windows
+
+    ----------------------------------------
+Command """"c:\users\\appdata\local\programs\python\python37-32\python.exe"" -u -c ""import setuptools, tokenize;__file__='C:\\Users\\\\AppData\\Local\\Temp\\pip-install-gfndyai5\\pyarrow\\setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))"" install --record C:\Users\\AppData\Local\Temp\pip-record-xs9wfdwm\install-record.txt --single-version-externally-managed --compile"" failed with error code 1 in C:\Users\\AppData\Local\Temp\pip-install-gfndyai5\pyarrow\
+
+</code></pre>
+
+<p>I've tried to read up this issue and it appears to me that either:</p>
+
+<ol>
+<li>pyarrow is not compatible with python3.7 (which is strange because I've tried installation on an OS machine)</li>
+<li><p>I'm doing the installation wrong.</p>
+
+<blockquote>
+  <p>If 1) I'm more than happy to downgrade my python version. If you know what python version (more than 3) supports pyarrow I'll be happy to downgrade it.
+  If 2) Please provide indications to how properly install it.</p>
+</blockquote></li>
+<li><p>(Unlikely) If there is a way to install xbbg without pyarrow, I'll be happy to know how. Remember the goal is to install xbbg.</p></li>
+</ol>
+
+<p>Many thanks.</p>
+"
+Error Handling and Code Debugging,4,"<p>I have setup all the requirement packages installed on my VM and i found no nvidia GPU driver  installed, In the requirements doesn't have nvidia GPU driver installation instructions, I want to know which cuda version and it compatible nvidia driver which needs too resolve the below error.</p>
+
+<p>Github link: <a href=""https://github.com/kamalkraj/BERT-NER"" rel=""noreferrer"">github</a></p>
+
+<p><strong>Error logs:</strong></p>
+
+<pre><code>  File ""run_ner.py"", line 594, in &lt;module&gt;
+    main()
+  File ""run_ner.py"", line 489, in main
+    loss = model(input_ids, segment_ids, input_mask, label_ids,valid_ids,l_mask)
+  File ""/home/pt3_gcp/BERT-NER/ber_ner/lib/python3.7/site-packages/torch/nn/modules/module.py"", line 547, in __call__
+    result = self.forward(*input, **kwargs)
+  File ""run_ner.py"", line 35, in forward
+    valid_output = torch.zeros(batch_size,max_len,feat_dim,dtype=torch.float32,device='cuda')
+  File ""/home/pt3_gcp/BERT-NER/ber_ner/lib/python3.7/site-packages/torch/cuda/__init__.py"", line 178, in _lazy_init
+    _check_driver()
+  File ""/home/pt3_gcp/BERT-NER/ber_ner/lib/python3.7/site-packages/torch/cuda/__init__.py"", line 99, in _check_driver
+    http://www.nvidia.com/Download/index.aspx"""""")
+AssertionError: 
+**Found no NVIDIA driver on your system. Please check that you
+have an NVIDIA GPU and installed a driver from
+http://www.nvidia.com/Download/index.aspx
+**
+</code></pre>
+
+<p>After installing latest cuda version from the following link,
+<a href=""https://developer.nvidia.com/cuda-downloads?target_os=Linux&amp;target_arch=x86_64&amp;target_distro=Ubuntu&amp;target_version=1804&amp;target_type=debnetwork"" rel=""noreferrer"">cuda</a> I got the following error,</p>
+
+<pre><code>06/04/2020 07:38:40 - INFO - __main__ -   ***** Running training *****
+06/04/2020 07:38:40 - INFO - __main__ -     Num examples = 14041
+06/04/2020 07:38:40 - INFO - __main__ -     Batch size = 32
+06/04/2020 07:38:40 - INFO - __main__ -     Num steps = 2190
+Epoch:   0%|                                                                                 | 0/5 [00:00&lt;?, ?it/sTHCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=50 error=38 : no CUDA-capable device is detectedt/s]
+Traceback (most recent call last):
+  File ""run_ner.py"", line 594, in &lt;module&gt;
+    main()
+  File ""run_ner.py"", line 489, in main
+    loss = model(input_ids, segment_ids, input_mask, label_ids,valid_ids,l_mask)
+  File ""/home/pt3_gcp/.local/lib/python3.7/site-packages/torch/nn/modules/module.py"", line 547, in __call__
+    result = self.forward(*input, **kwargs)
+  File ""run_ner.py"", line 35, in forward
+    valid_output = torch.zeros(batch_size,max_len,feat_dim,dtype=torch.float32,device='cuda')
+  File ""/home/pt3_gcp/.local/lib/python3.7/site-packages/torch/cuda/__init__.py"", line 179, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: cuda runtime error (38) : no CUDA-capable device is detected at /pytorch/aten/src/THC/THCGeneral.cpp:50
+</code></pre>
+"
+Error Handling and Code Debugging,4,"<p>I am trying to execute the following python code. </p>
+
+<pre><code>from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import RandomizedSearchCV
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.models import Sequential
+from keras import layers
+def create_model(num_filters, kernel_size, vocab_size, embedding_dim, maxlen):
+    model = Sequential()
+    model.add(layers.Embedding(vocab_size, embedding_dim, input_length=maxlen))
+    model.add(layers.Conv1D(num_filters, kernel_size, activation='relu'))
+    model.add(layers.GlobalMaxPooling1D())
+    model.add(layers.Dense(10, activation='relu'))
+    model.add(layers.Dense(1, activation='sigmoid'))
+    model.compile(optimizer='adam',
+                  loss='binary_crossentropy',
+                  metrics=['accuracy'])
+    return model
+
+
+filepath_dict = {'yelp':   'yelp_labelled.txt'}
+
+df_list = []
+for source, filepath in filepath_dict.items():
+    df = pd.read_csv(filepath, names=['sentence', 'label'], sep='\t')
+    df['source'] = source  # Add another column filled with the source name
+    df_list.append(df)
+
+df = pd.concat(df_list)
+# Main settings
+epochs = 20
+embedding_dim = 50
+maxlen = 100
+output_file = 'output.txt'
+
+# Run grid search for each source (yelp, amazon, imdb)
+for source, frame in df.groupby('source'):
+    print('Running grid search for data set :', source)
+    sentences = df['sentence'].values
+    y = df['label'].values
+
+    # Train-test split
+    sentences_train, sentences_test, y_train, y_test = train_test_split(
+        sentences, y, test_size=0.25, random_state=1000)
+
+    # Tokenize words
+    tokenizer = Tokenizer(num_words=5000)
+    tokenizer.fit_on_texts(sentences_train)
+    X_train = tokenizer.texts_to_sequences(sentences_train)
+    X_test = tokenizer.texts_to_sequences(sentences_test)
+
+    # Adding 1 because of reserved 0 index
+    vocab_size = len(tokenizer.word_index) + 1
+
+    # Pad sequences with zeros
+    X_train = pad_sequences(X_train, padding='post', maxlen=maxlen)
+    X_test = pad_sequences(X_test, padding='post', maxlen=maxlen)
+
+    # Parameter grid for grid search
+    param_grid = dict(num_filters=[32, 64, 128],
+                      kernel_size=[3, 5, 7],
+                      vocab_size=[vocab_size],
+                      embedding_dim=[embedding_dim],
+                      maxlen=[maxlen])
+    model = KerasClassifier(build_fn=create_model,
+                            epochs=epochs, batch_size=10,
+                            verbose=False)
+    grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid,
+                              cv=4, verbose=1, n_iter=5)
+    grid_result = grid.fit(X_train, y_train)
+    # Evaluate testing set
+    test_accuracy = grid.score(X_test, y_test)
+
+    # Save and evaluate results
+    prompt = input(f'finished {source}; write to file and proceed? [y/n]')
+    if prompt.lower() not in {'y', 'true', 'yes'}:
+        break
+    with open(output_file, 'a') as f:
+        s = ('Running {} data set\nBest Accuracy : '
+             '{:.4f}\n{}\nTest Accuracy : {:.4f}\n\n')
+        output_string = s.format(
+            source,
+            grid_result.best_score_,
+            grid_result.best_params_,
+            test_accuracy)
+        print(output_string)
+        f.write(output_string)
+</code></pre>
+
+<p>But I am getting the following error.</p>
+
+<pre><code>Using TensorFlow backend.
+2020-02-07 12:47:46.158272: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open shared object file: No such file or directory
+2020-02-07 12:47:46.158397: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6: cannot open shared object file: No such file or directory
+2020-02-07 12:47:46.158417: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+Running grid search for data set : yelp
+Fitting 4 folds for each of 5 candidates, totalling 20 fits
+[Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
+2020-02-07 12:47:47.592085: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2020-02-07 12:47:47.598640: E tensorflow/stream_executor/cuda/cuda_driver.cc:351] failed call to cuInit: CUDA_ERROR_UNKNOWN: unknown error
+2020-02-07 12:47:47.598700: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (nsx-rasa): /proc/driver/nvidia/version does not exist
+2020-02-07 12:47:47.599076: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2020-02-07 12:47:47.610322: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2194840000 Hz
+2020-02-07 12:47:47.611554: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x79dcfe0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-02-07 12:47:47.611606: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+/image/env/lib/python3.6/site-packages/tensorflow_core/python/framework/indexed_slices.py:433: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  ""Converting sparse IndexedSlices to a dense Tensor of unknown shape. ""
+terminate called after throwing an instance of 'Xbyak::Error'
+  what():  can't protect
+Aborted (core dumped)
+</code></pre>
+
+<p>I have no clue of this error. I am trying to execute this code in ubuntu VM. </p>
+
+<blockquote>
+  <p>python --version >> Python 3.6.10</p>
+</blockquote>
+
+<p>OS details: <br>
+Distributor ID: Ubuntu<br>
+Description:    Ubuntu 16.04.2 LTS<br>
+Release:    16.04 <br>
+Codename:   xenial<br></p>
+
+<p>If someone has any clue regarding this error or how to avoid this error, please help. Thanks in advance.</p>
+"
+Error Handling and Code Debugging,4,"<p>trying to read Bloomberg data in Google Colab (have been using Bloomberg data in python via anaconda for a while). any ideas how to load it in the Colab environment? ^Thank you very much!</p>
+
+<p>!python -m pip install --index-url=<a href=""https://bloomberg.bintray.com/pip/simple"" rel=""nofollow noreferrer"">https://bloomberg.bintray.com/pip/simple</a> blpapi</p>
+
+<p>shows the following</p>
+
+<pre><code>Looking in indexes: https://bloomberg.bintray.com/pip/simple
+Collecting blpapi
+  Downloading https://bloomberg.bintray.com/pip/simple/blpapi/blpapi-3.14.0.tar.gz (221kB)
+     |████████████████████████████████| 225kB 3.7MB/s 
+ERROR: Command errored out with exit status 1: python setup.py egg_info Check the logs for full command output.
+</code></pre>
+"
+Data Structures and Output Formatting,5,"<p>I've created a function that searches a NLTK.text.Text object, and returns a value when I run the function. </p>
+
+<p>UPDATE: The problem seems to be that in the function below, the 'donation' variable is not actually being passed a value. The text.findall function however does return a value but doesn't update the variable for some reason.</p>
+
+<pre><code>def find_donation_orgs(x):
+    text = nltk.Text(nltk.word_tokenize(x))
+    donation =  text.findall(r""&lt;\.&gt; &lt;.*&gt;{,15}? &lt;donat.*|contrib.*|Donat.*|Contrib.*&gt; &lt;.*&gt;*? &lt;to&gt; (&lt;.*&gt;+?) &lt;\.|\,|\;&gt; "")
+    return donation
+</code></pre>
+
+<p>The output something like this for the following input, however I think the output is from the text.findall and not the actual ""return donation"".</p>
+
+<pre><code>a = ""This is a sentence. I also donate to Mr. T's Tea Party. I contribute to the Boys and Girls club. ""
+
+find_donation_orgs(a)
+</code></pre>
+
+<p>Output = </p>
+
+<pre><code>Mr. T 's Tea Party
+the Boys and Girls club
+</code></pre>
+
+<p>However, when I try to apply that function in order to write the output to a new column in a pandas data frame, it's returning None. See below:</p>
+
+<pre><code>df['donation_orgs'] = df.apply(lambda row: find_donation_orgs(row['Obit']), axis = 1)
+</code></pre>
+
+<p>where df['Obit'] is a string of text similar to my a variable above. </p>
+
+<p>UPDATE: So it appears that the output of a text.findall doesn't update the value of the variable its assigned to ... so I need to figure out how to actually assign that output to a variable in order to return it to a dataframe. See below:</p>
+
+<pre><code>text = df.text.iloc[1]
+
+textfindall = text.findall(r""&lt;\.&gt; &lt;.*&gt;{,15}? &lt;donat.*|contrib.*|Donat.*|Contrib.*&gt; &lt;.*&gt;*? &lt;to&gt; (&lt;.*&gt;+?) &lt;\.|\,|\;&gt; "")
+
+print('text is ' + str(type(text)))
+print('textfindall is ' + str(type(textfindall)))
+print(textfindall)
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>visit brother Alfred Fuller; the research of Dr. Giuseppe Giaccone at
+Georgetown University
+text is &lt;class 'nltk.text.Text'&gt;
+textfindall is &lt;class 'NoneType'&gt;
+none
+</code></pre>
+"
+Data Structures and Output Formatting,5,"<p>I'm trying to extract keys from a dictionary. After extracting, I'm storing them in a list and converting them back to a dict. While doing so, I'm getting a shuffled output of the keys. The order is not conserved. Using Python 3.8. Please help. Thank you!</p>
+<pre><code>output = {'aimless': 6.922918004572872,
+  'distressed': 7.922918004572872,
+  'drifting': 64.922918004572872,
+  'nearly': 16.922918004572872,
+  'attempting':856.922918004572872,
+  'artiness': 3.922918004572872,
+  'existent': 2.922918004572872,
+         }
+sorted_freq = dict(sorted(output.items(), key=lambda x: x[1]))
+nocab = list(sorted_freq.keys())
+nocab = nocab[::-1]
+brocab = {key for key in nocab}
+</code></pre>
+<p><strong>The output I'm getting:</strong></p>
+<pre><code>{'aimless',
+ 'artiness',
+ 'attempting',
+ 'distressed',
+ 'drifting',
+ 'existent',
+ 'nearly'}
+</code></pre>
+<p><strong>The output I want (sorted according to their values in output):</strong></p>
+<pre><code>{'attempting',
+ 'drifting',
+ 'nearly',
+ 'distressed',
+ 'aimless',
+ 'artiness',
+ 'existent'}
+</code></pre>
+"
+Data Structures and Output Formatting,5,"<p>I have a dataframe with tokens like below and i want to match with keys of a dictionary and get corresponding key and value.</p>
+
+<p>Dataframe:</p>
+
+<pre><code>    A                     B
+    1          ['i','like','apples', 'banana' ,'lot','however','do','not','eat','them','but' , 'sandwich'  , 'also' , 'good']
+    2          ['avengers','series','something','like','most','annabelle','movies' , 'cannot' ,'watch' , 'night' , 'time']
+    3          ['virat kohli','batsmen','world','like','most','federer','nadal' ,'tennis']
+</code></pre>
+
+<p>I have a dictionary like below:</p>
+
+<pre><code> key          value
+apple         fruit
+banana        fruit
+grapes        fruit
+sandwich      junkfood
+noodles       junkfood
+avengers      action
+deadpool      action
+annabelle     horror
+virat kohli   cricket
+federer       tennis
+nadal         tennis
+timo ball     table tennis
+</code></pre>
+
+<p>I want to match all the tokens of a row with keys of dictionary and get matched keys and value like below.</p>
+
+<p>output:</p>
+
+<pre><code>A              B                                     C
+1       [fruit , junk food]           ['apple' , 'banana' , 'sandwich']
+2       ['action' , 'horror']         ['avengers' , 'annabelle']
+3       ['cricket' , 'tennis']        ['virat kohli' ,'nadal' , 'federer']
+</code></pre>
+"
+General Programming and Language Usage Questions,6,"<p>I'm pretty sure a human language (e.g. English) is powerful enough to simulate a Turing machine, which would make it Turing complete. However, that would imply natural languages are no more or less expressive than programming languages, which seems questionable.</p>
+
+<p>Is natural language Turing complete?</p>
+"
+General Programming and Language Usage Questions,6,"<p>I'm pretty sure a human language (e.g. English) is powerful enough to simulate a Turing machine, which would make it Turing complete. However, that would imply natural languages are no more or less expressive than programming languages, which seems questionable.</p>
+
+<p>Is natural language Turing complete?</p>
+"
+General Programming and Language Usage Questions,6,"<p>I am doing natural language processing using NLTK for Python.</p>
+
+<p>I find myself doing my programming more in the functional style, and am thinking about switching to a functional language. However, I need a good NLP library, at least comparable to NLTK.</p>
+
+<p>Do you know a functional programming language which has good NLP libraries? I discovered that there is some NLP activity in the Haskell community, but it seems still in it's infancy compared to NLTK.</p>
+"
+Training Transformer-Based Language Models,7,"<p>I have created a CNN model for classifying text data. Please help me interpret my result and tell me why is my training accuracy less than validation accuracy?</p>
+
+<p>I have a total of 2619 Data, all of them are text data. There are two different classes. Here is a sample of my dataset. </p>
+
+<p><a href=""https://i.sstatic.net/q3ukZ.jpg"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/q3ukZ.jpg"" alt=""Dataset Sample""></a></p>
+
+<p><strong>The validation set has 34 data. Rest of 2619 data are training data.</strong> </p>
+
+<p>I have done RepeatedKfold cross-validation. Here is my code.</p>
+
+<pre><code>from sklearn.model_selection import RepeatedKFold 
+kf = RepeatedKFold(n_splits=75, n_repeats=1, random_state= 42) 
+
+for train_index, test_index in kf.split(X,Y):
+      #print(""Train:"", train_index, ""Validation:"",test_index)
+      x_train, x_test = X.iloc[train_index], X.iloc[test_index] 
+      y_train, y_test = Y.iloc[train_index], Y.iloc[test_index]
+</code></pre>
+
+<p>I have used CNN. Here is my model.</p>
+
+<pre><code>model = Sequential()
+model.add(Embedding(2900,2 , input_length=1))
+model.add(Conv1D(filters=2, kernel_size=3, kernel_regularizer=l2(0.0005 ), bias_regularizer=l2(0.0005 ), padding='same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.3))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(1, kernel_regularizer=l2(0.0005 ), bias_regularizer=l2(0.0005 ), activation='sigmoid'))
+model.add(Dropout(0.25))
+adam = optimizers.Adam(lr = 0.0005, beta_1 = 0.9, beta_2 = 0.999, epsilon = None, decay = 0.0, amsgrad = False)
+model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
+print(model.summary())
+history = model.fit(x_train, y_train, epochs=300,validation_data=(x_test, y_test), batch_size=128, shuffle=False)
+# Final evaluation of the model
+scores = model.evaluate(x_test, y_test, verbose=0)
+print(""Accuracy: %.2f%%"" % (scores[1]*100))
+</code></pre>
+
+<p>And here is the result.</p>
+
+<pre><code>Epoch 295/300
+2585/2585 [==============================] - 0s 20us/step - loss: 1.6920 - acc: 0.7528 - val_loss: 0.5839 - val_acc: 0.8235
+Epoch 296/300
+2585/2585 [==============================] - 0s 20us/step - loss: 1.6532 - acc: 0.7617 - val_loss: 0.5836 - val_acc: 0.8235
+Epoch 297/300
+2585/2585 [==============================] - 0s 27us/step - loss: 1.5328 - acc: 0.7551 - val_loss: 0.5954 - val_acc: 0.8235
+Epoch 298/300
+2585/2585 [==============================] - 0s 20us/step - loss: 1.6289 - acc: 0.7524 - val_loss: 0.5897 - val_acc: 0.8235
+Epoch 299/300
+2585/2585 [==============================] - 0s 21us/step - loss: 1.7000 - acc: 0.7582 - val_loss: 0.5854 - val_acc: 0.8235
+Epoch 300/300
+2585/2585 [==============================] - 0s 25us/step - loss: 1.5475 - acc: 0.7451 - val_loss: 0.5934 - val_acc: 0.8235
+Accuracy: 82.35%
+</code></pre>
+
+<p>Please help me with my problem. Thank you. </p>
+"
+Training Transformer-Based Language Models,7,"<p>I have created a CNN model for classifying text data. Please help me interpret my result and tell me why is my training accuracy less than validation accuracy?</p>
+
+<p>I have a total of 2619 Data, all of them are text data. There are two different classes. Here is a sample of my dataset. </p>
+
+<p><a href=""https://i.sstatic.net/q3ukZ.jpg"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/q3ukZ.jpg"" alt=""Dataset Sample""></a></p>
+
+<p><strong>The validation set has 34 data. Rest of 2619 data are training data.</strong> </p>
+
+<p>I have done RepeatedKfold cross-validation. Here is my code.</p>
+
+<pre><code>from sklearn.model_selection import RepeatedKFold 
+kf = RepeatedKFold(n_splits=75, n_repeats=1, random_state= 42) 
+
+for train_index, test_index in kf.split(X,Y):
+      #print(""Train:"", train_index, ""Validation:"",test_index)
+      x_train, x_test = X.iloc[train_index], X.iloc[test_index] 
+      y_train, y_test = Y.iloc[train_index], Y.iloc[test_index]
+</code></pre>
+
+<p>I have used CNN. Here is my model.</p>
+
+<pre><code>model = Sequential()
+model.add(Embedding(2900,2 , input_length=1))
+model.add(Conv1D(filters=2, kernel_size=3, kernel_regularizer=l2(0.0005 ), bias_regularizer=l2(0.0005 ), padding='same', activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.3))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(1, kernel_regularizer=l2(0.0005 ), bias_regularizer=l2(0.0005 ), activation='sigmoid'))
+model.add(Dropout(0.25))
+adam = optimizers.Adam(lr = 0.0005, beta_1 = 0.9, beta_2 = 0.999, epsilon = None, decay = 0.0, amsgrad = False)
+model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
+print(model.summary())
+history = model.fit(x_train, y_train, epochs=300,validation_data=(x_test, y_test), batch_size=128, shuffle=False)
+# Final evaluation of the model
+scores = model.evaluate(x_test, y_test, verbose=0)
+print(""Accuracy: %.2f%%"" % (scores[1]*100))
+</code></pre>
+
+<p>And here is the result.</p>
+
+<pre><code>Epoch 295/300
+2585/2585 [==============================] - 0s 20us/step - loss: 1.6920 - acc: 0.7528 - val_loss: 0.5839 - val_acc: 0.8235
+Epoch 296/300
+2585/2585 [==============================] - 0s 20us/step - loss: 1.6532 - acc: 0.7617 - val_loss: 0.5836 - val_acc: 0.8235
+Epoch 297/300
+2585/2585 [==============================] - 0s 27us/step - loss: 1.5328 - acc: 0.7551 - val_loss: 0.5954 - val_acc: 0.8235
+Epoch 298/300
+2585/2585 [==============================] - 0s 20us/step - loss: 1.6289 - acc: 0.7524 - val_loss: 0.5897 - val_acc: 0.8235
+Epoch 299/300
+2585/2585 [==============================] - 0s 21us/step - loss: 1.7000 - acc: 0.7582 - val_loss: 0.5854 - val_acc: 0.8235
+Epoch 300/300
+2585/2585 [==============================] - 0s 25us/step - loss: 1.5475 - acc: 0.7451 - val_loss: 0.5934 - val_acc: 0.8235
+Accuracy: 82.35%
+</code></pre>
+
+<p>Please help me with my problem. Thank you. </p>
+"
+Training Transformer-Based Language Models,7,"<p>I am using PyTorch to train a deep learning model. I wonder if it is possible for me to separately save the model weight. For example:</p>
+<pre><code>class my_model(nn.Module):
+def __init__(self):
+    super(my_model, self).__init__()
+    self.bert = transformers.AutoModel.from_pretrained(BERT_PATH)
+    self.out = nn.Linear(768,1)
+    
+def forward(self, ids, mask, token_type):
+    x = self.bert(ids, mask, token_type)[1]
+    x = self.out(x)
+    
+    return x
+</code></pre>
+<p>I have the BERT model as the base model and an additional linear layer on the top. After I train this model, can I save the weight for the BERT model and this linear layer separately?</p>
+"
+Part-of-Speech Tagging and Linguistic Annotation,8,"<p>I need to create a not condition as part of my grammar in NLTK's regex parser. I would like to chunk those words which are of structure <code>'Coffee &amp; Tea'</code> but it should not chunk if there is a word of type <code>&lt;IN&gt;</code> before the sequence. For example <code>'in London and Paris'</code> should not be chunked by the parser.</p>
+
+<p>My code is as follows:</p>
+
+<pre><code>grammar = r'''NP: {(^&lt;IN&gt;)&lt;NNP&gt;+&lt;CC&gt;&lt;NN.*&gt;+}'''
+</code></pre>
+
+<p>I tried the above grammar to solve the problem but it is not working could someone please tell me what I am doing wrong.</p>
+
+<p>Example:</p>
+
+<pre><code>def parse_sentence(sentence):
+    pos_sentence = nltk.pos_tag(nltk.word_tokenize(sentence))
+    grammar = r'''NP: {&lt;NNP&gt;+&lt;CC&gt;&lt;NN.*&gt;+}'''
+    parser = nltk.RegexpParser(grammar)
+    result = parser.parse(pos_sentence)
+    print result
+
+sentence1 = 'Who is the front man of the band that wrote Coffee &amp; TV?'
+parse_sentence(sentence1)
+
+sentence2 = 'Who of those resting in Westminster Abbey wrote a book set in London and Paris?'
+parse_sentence(sentence2)
+
+Result for sentence 1 is:
+(S
+  Who/WP
+  is/VBZ
+  the/DT
+  front/JJ
+  man/NN
+  of/IN
+  the/DT
+  band/NN
+  that/WDT
+  wrote/VBD
+  (NP Coffee/NNP &amp;/CC TV/NN)
+  ?/.)
+
+Result for sentence2 is:
+(S
+  Who/WP
+  of/IN
+  those/DT
+  resting/VBG
+  in/IN
+  Westminster/NNP
+  Abbey/NNP
+  wrote/VBD
+  a/DT
+  book/NN
+  set/VBN
+  in/IN
+  (NP London/NNP and/CC Paris/NNP)
+  ?/.)
+</code></pre>
+
+<p>As can be seen in both sentence1 and sentence2 the phrases <code>Coffee &amp; Tea</code> and <code>London and Paris</code> get chunked as a group although I do not wish to chunk <code>London and Paris</code>. One way of doing that is to ignore those patterns which are preceded by a <code>&lt;IN&gt;</code> POS Tag.</p>
+
+<p><strong>In a nutshell I need to know how to add NOT(negation) conditions for POS tags in a regex parser's grammar. Standard syntax of using '^' followed by the tag definition does not seem to work</strong></p>
+"
+Part-of-Speech Tagging and Linguistic Annotation,8,"<p>I need to create a not condition as part of my grammar in NLTK's regex parser. I would like to chunk those words which are of structure <code>'Coffee &amp; Tea'</code> but it should not chunk if there is a word of type <code>&lt;IN&gt;</code> before the sequence. For example <code>'in London and Paris'</code> should not be chunked by the parser.</p>
+
+<p>My code is as follows:</p>
+
+<pre><code>grammar = r'''NP: {(^&lt;IN&gt;)&lt;NNP&gt;+&lt;CC&gt;&lt;NN.*&gt;+}'''
+</code></pre>
+
+<p>I tried the above grammar to solve the problem but it is not working could someone please tell me what I am doing wrong.</p>
+
+<p>Example:</p>
+
+<pre><code>def parse_sentence(sentence):
+    pos_sentence = nltk.pos_tag(nltk.word_tokenize(sentence))
+    grammar = r'''NP: {&lt;NNP&gt;+&lt;CC&gt;&lt;NN.*&gt;+}'''
+    parser = nltk.RegexpParser(grammar)
+    result = parser.parse(pos_sentence)
+    print result
+
+sentence1 = 'Who is the front man of the band that wrote Coffee &amp; TV?'
+parse_sentence(sentence1)
+
+sentence2 = 'Who of those resting in Westminster Abbey wrote a book set in London and Paris?'
+parse_sentence(sentence2)
+
+Result for sentence 1 is:
+(S
+  Who/WP
+  is/VBZ
+  the/DT
+  front/JJ
+  man/NN
+  of/IN
+  the/DT
+  band/NN
+  that/WDT
+  wrote/VBD
+  (NP Coffee/NNP &amp;/CC TV/NN)
+  ?/.)
+
+Result for sentence2 is:
+(S
+  Who/WP
+  of/IN
+  those/DT
+  resting/VBG
+  in/IN
+  Westminster/NNP
+  Abbey/NNP
+  wrote/VBD
+  a/DT
+  book/NN
+  set/VBN
+  in/IN
+  (NP London/NNP and/CC Paris/NNP)
+  ?/.)
+</code></pre>
+
+<p>As can be seen in both sentence1 and sentence2 the phrases <code>Coffee &amp; Tea</code> and <code>London and Paris</code> get chunked as a group although I do not wish to chunk <code>London and Paris</code>. One way of doing that is to ignore those patterns which are preceded by a <code>&lt;IN&gt;</code> POS Tag.</p>
+
+<p><strong>In a nutshell I need to know how to add NOT(negation) conditions for POS tags in a regex parser's grammar. Standard syntax of using '^' followed by the tag definition does not seem to work</strong></p>
+"
+Part-of-Speech Tagging and Linguistic Annotation,8,"<p>I need to create a not condition as part of my grammar in NLTK's regex parser. I would like to chunk those words which are of structure <code>'Coffee &amp; Tea'</code> but it should not chunk if there is a word of type <code>&lt;IN&gt;</code> before the sequence. For example <code>'in London and Paris'</code> should not be chunked by the parser.</p>
+
+<p>My code is as follows:</p>
+
+<pre><code>grammar = r'''NP: {(^&lt;IN&gt;)&lt;NNP&gt;+&lt;CC&gt;&lt;NN.*&gt;+}'''
+</code></pre>
+
+<p>I tried the above grammar to solve the problem but it is not working could someone please tell me what I am doing wrong.</p>
+
+<p>Example:</p>
+
+<pre><code>def parse_sentence(sentence):
+    pos_sentence = nltk.pos_tag(nltk.word_tokenize(sentence))
+    grammar = r'''NP: {&lt;NNP&gt;+&lt;CC&gt;&lt;NN.*&gt;+}'''
+    parser = nltk.RegexpParser(grammar)
+    result = parser.parse(pos_sentence)
+    print result
+
+sentence1 = 'Who is the front man of the band that wrote Coffee &amp; TV?'
+parse_sentence(sentence1)
+
+sentence2 = 'Who of those resting in Westminster Abbey wrote a book set in London and Paris?'
+parse_sentence(sentence2)
+
+Result for sentence 1 is:
+(S
+  Who/WP
+  is/VBZ
+  the/DT
+  front/JJ
+  man/NN
+  of/IN
+  the/DT
+  band/NN
+  that/WDT
+  wrote/VBD
+  (NP Coffee/NNP &amp;/CC TV/NN)
+  ?/.)
+
+Result for sentence2 is:
+(S
+  Who/WP
+  of/IN
+  those/DT
+  resting/VBG
+  in/IN
+  Westminster/NNP
+  Abbey/NNP
+  wrote/VBD
+  a/DT
+  book/NN
+  set/VBN
+  in/IN
+  (NP London/NNP and/CC Paris/NNP)
+  ?/.)
+</code></pre>
+
+<p>As can be seen in both sentence1 and sentence2 the phrases <code>Coffee &amp; Tea</code> and <code>London and Paris</code> get chunked as a group although I do not wish to chunk <code>London and Paris</code>. One way of doing that is to ignore those patterns which are preceded by a <code>&lt;IN&gt;</code> POS Tag.</p>
+
+<p><strong>In a nutshell I need to know how to add NOT(negation) conditions for POS tags in a regex parser's grammar. Standard syntax of using '^' followed by the tag definition does not seem to work</strong></p>
+"
+Neural Network Implementation and PyTorch Configuration,9,"<p>class BERTPooler(nn.Module):
+def <strong>init</strong>(self, config):
+super(BERTPooler, self).<strong>init</strong>()
+self.dense = nn.Linear(config.hidden_size, config.hidden_size)
+self.activation = nn.Tanh()</p>
+<pre><code>def forward(self, hidden_states):
+    # We &quot;pool&quot; the model by simply taking the hidden state corresponding
+    # to the first token.
+    first_token_tensor = hidden_states[:, 0]
+    pooled_output = self.dense(first_token_tensor)
+    pooled_output = self.activation(pooled_output)
+    return pooled_output
+</code></pre>
+"
+Neural Network Implementation and PyTorch Configuration,9,"<p>class BERTPooler(nn.Module):
+def <strong>init</strong>(self, config):
+super(BERTPooler, self).<strong>init</strong>()
+self.dense = nn.Linear(config.hidden_size, config.hidden_size)
+self.activation = nn.Tanh()</p>
+<pre><code>def forward(self, hidden_states):
+    # We &quot;pool&quot; the model by simply taking the hidden state corresponding
+    # to the first token.
+    first_token_tensor = hidden_states[:, 0]
+    pooled_output = self.dense(first_token_tensor)
+    pooled_output = self.activation(pooled_output)
+    return pooled_output
+</code></pre>
+"
+Neural Network Implementation and PyTorch Configuration,9,"<p>df['name']'s all elements are string</p>
+<pre><code>a = list(df['name'])
+
+text_vectorization = TextVectorization(output_mode = &quot;int&quot;,
+                                       max_tokens=100,
+                                       output_length=10)
+
+
+my_li = []
+for i in a:
+  my_li.append(list(text_vectorization(i)))
+
+my_li[0]
+</code></pre>
+<p>my_li[0] is</p>
+<blockquote>
+<p>[&lt;tf.Tensor: shape=(), dtype=int64, numpy=22&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=79&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=13&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=3&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=8&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=4&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=5&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=63&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=34&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=2&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=10&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=25&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=74&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=53&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=85&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=7&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=27&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=54&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=125&gt;, &lt;tf.Tensor: shape=(), dtype=int64, numpy=76&gt;]</p>
+</blockquote>
+<p>i need a numpy array of to learn by putting them in the model</p>
+<p>I want to change &quot;my_li&quot; list to numpy array</p>
+"
+Game AI and Search Algorithms (Minimax),10,"<p>Hexapawn is a simple turn based game played on a 3 × 3 board. Each player
+begins with 3 pawns - WHITE (MAX) in the bottom row and BLACK (MIN) in the top row.</p>
+<p>Pawns can move as normal in chess (i.e. white pawns can move up one square or can capture a black pawn diagonally up one square, and black pawns can move down one square or can capture a white pawn diagonally down one square). The goal of each player is to either get one of their pawns to the other end of the board, or to make it such that their opponent is stuck on their next move. Figure 1 shows the initial state of the game.</p>
+<p>pseudo-code:</p>
+<pre><code>rows = 3;
+cols = 3;
+scale = 1;
+
+for row in range(rows):
+    for col in range(cols):
+        createSquare(origin=(row*scale, col*scale), end=((row+1)*scale, (col+1)*scale))
+        if row == 0:
+            createBlackPawn(origin=(row*scale, col*scale), end=((row+1)*scale, (col+1)*scale))
+        elif row == 2:
+            createWhitePawn(origin=(row*scale, col*scale), end=((row+1)*scale, (col+1)*scale))
+</code></pre>
+<p>Show the value of the game from the state using Alpha-Beta pruning. Mark any branches that will be pruned, and show what the bounds on the payoffs are for each player at each state not pruned.</p>
+<p><a href=""https://i.sstatic.net/qLjAm.png"" rel=""nofollow noreferrer"">From This state of game</a></p>
+"
+Game AI and Search Algorithms (Minimax),10,"<p>I'm trying to create an AI player for a game using the minimax algorithm with alpha-beta pruning. I'm having some trouble trying to implement it properly. I have 2 functions to work with, one to evaluate the current state of my board for a given player (that returns some score) getBoardScore, and another to return all the possible board states created by every possible move (from a given board state for a given player) getPossibleBoards. </p>
+
+<p>My AI makes a move by initially calling alphaBeta, passing it the current board state. It then sets a new board state from a variable 'bestBoard' which the alphaBeta function had recursively modified. Here is my code for my alphaBeta function:</p>
+
+<pre><code> static int MAX = -1;
+ static int MIN = 1;
+ Board node;
+ Board bestBoard;   
+
+public int alphaBeta(Board node, int depth, int alpha, int beta, int player) {
+
+    if (depth == 0 || node.gameFinished()) {
+        return node.getBoardScore(player);
+    }
+
+    ArrayList&lt;Board&gt; childNodes = node.getPossibleBoards(player); //All valid moves from current the board state
+    if (player == MAX) {
+        for (Board currentBoard: childNodes) {
+            int result = alphaBeta(currentBoard, depth-1, alpha, beta, -player);      
+            if (alpha &lt; result) {
+                alpha = result;
+                    bestBoard = currentBoard;
+            }
+            if (beta &lt;= alpha) {
+                break; //alpha cut-off                            
+            }
+        }                    
+    return alpha;
+    }
+    else { 
+        for (Board currentBoard: childNodes) {
+            int result = alphaBeta(currentBoard, depth-1, alpha, beta, -player);
+            if (beta &gt; result) {
+                beta = result;
+                    bestBoard = currentBoard;
+            }
+            if (beta &lt;= alpha) {
+                    break; //alpha cut-off
+            }                            
+        }
+        return beta;
+    }
+}
+</code></pre>
+
+<p>My issue is that it's just setting my bestBoard variable to the last board state looked at (and not the optimal one). I can't seem to figure out where I should be setting my bestBoard variable (or if I should have some condition before I set it). Could anyone point me in the right direction? Thanks</p>
+"
+Game AI and Search Algorithms (Minimax),10,"<p>So, I am trying to implement <code>minimax</code> algorithm for a simple game that has 2 players each having 2 queens. So total 4 queens on a 7X7 board. So on each turn, the players moves both of his queens to a new position.</p>
+
+<p>I try to find the <code>min</code> and <code>max</code> by recursing over, <code>minimax</code> function as shown below. The base case is supposed to return an integer, which is a score returned by the evaluation function. But how do I find the <code>min</code> and the <code>max</code> after I have traversed till the leaf node? </p>
+
+<p>This function should be able to return the best move for queen1 and the queen2. But I do not understand, as to how to proceed to find the min and max from leaf node value. How do I propagte the values. I just cannot understand/visualize this.</p>
+"
+Vector Representations and Document Similarity,11,"<p>I am using WordNet to access synonyms that share a common meaning. Here is an example:</p>
+
+<pre><code>from itertools import chain
+from nltk.corpus import wordnet as wn
+
+synsets = wn.synsets(""drink"")
+# synsets = [Synset('drink.n.01'), Synset('drink.n.02'), Synset('beverage.n.01'), ...]
+synonyms = set(chain(*(x.lemma_names() for x in synsets)))
+# synonyms = {'drinking', 'drinkable', 'crapulence', 'toast', 'drink', 'drunkenness', ...}
+</code></pre>
+
+<p>Are synsets sorted? And, in case they are, what are the criteria? Are the first synsets of the list those which have higher chances to be correlated to the given word?</p>
+
+<p>I would like to limit the number of synonyms by keeping only the ""most important"" ones (what ""important"" means in this context is to be defined, but I wonder whether WordNet has its own concept of ""important"").</p>
+
+<p>If synsets are not sorted, what could be an alternative way to find the most appropriate synonyms of a word?</p>
+"
+Vector Representations and Document Similarity,11,"<p>I am using WordNet to access synonyms that share a common meaning. Here is an example:</p>
+
+<pre><code>from itertools import chain
+from nltk.corpus import wordnet as wn
+
+synsets = wn.synsets(""drink"")
+# synsets = [Synset('drink.n.01'), Synset('drink.n.02'), Synset('beverage.n.01'), ...]
+synonyms = set(chain(*(x.lemma_names() for x in synsets)))
+# synonyms = {'drinking', 'drinkable', 'crapulence', 'toast', 'drink', 'drunkenness', ...}
+</code></pre>
+
+<p>Are synsets sorted? And, in case they are, what are the criteria? Are the first synsets of the list those which have higher chances to be correlated to the given word?</p>
+
+<p>I would like to limit the number of synonyms by keeping only the ""most important"" ones (what ""important"" means in this context is to be defined, but I wonder whether WordNet has its own concept of ""important"").</p>
+
+<p>If synsets are not sorted, what could be an alternative way to find the most appropriate synonyms of a word?</p>
+"
+Vector Representations and Document Similarity,11,"<p>I am writing a spell checker using nltk and wordnet, I have a few wrongly spelt words say ""belive"". What I want to do is find all words from wordnet that are separated by a leveshtein's edit distance of 1 or 2 from this given word. 
+Does nltk provide any methods to accomplish this? How to do this?</p>
+
+<hr>
+
+<p>May be, I put it wrongly. the <code>edit_distance</code> method takes 2 arguments like <code>edit_distance(word1,word2)</code> returns the levenshtein's distance between word1 and word2.
+What I want is to find edit distance between the word I give with every other word in wordnet.</p>
+"
